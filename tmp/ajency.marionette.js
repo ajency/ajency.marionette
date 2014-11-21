@@ -26,7 +26,26 @@
       return Mustache.render(template, view, partials);
     };
   };
+  _.extend(Marionette.TemplateCache, {
+    get: function(template) {
+      var cachedTemplate, possibleTemplateId, templateId;
+      possibleTemplateId = template.indexOf('<') === -1;
+      if (!possibleTemplateId || Backbone.$(possibleTemplateId).length === 0) {
+        return Marionette.TemplateCache.prototype.nonScriptTemplate(template);
+      }
+      templateId = template;
+      cachedTemplate = this.templateCaches[templateId];
+      if (!cachedTemplate) {
+        cachedTemplate = new Marionette.TemplateCache(templateId);
+        this.templateCaches[templateId] = cachedTemplate;
+      }
+      return cachedTemplate.load();
+    }
+  });
   _.extend(Marionette.TemplateCache.prototype, {
+    nonScriptTemplate: function(template) {
+      return this.compileTemplate(template);
+    },
     compileTemplate: function(rawTemplate) {
       return Mustache.compile(rawTemplate);
     }

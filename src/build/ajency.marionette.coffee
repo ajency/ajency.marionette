@@ -26,6 +26,6 @@
 	# the root object of the plugin
 	Ajency = {}
 
-	# @include ../templates.and.renderer.coffee
+	# @include ../templateCache.coffee
 
 	Ajency

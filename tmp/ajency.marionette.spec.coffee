@@ -1,12 +1,26 @@
 
 describe "Marionette TemplateCache", ->
 
-	beforeEach ->
-		Marionette.TemplateCache.clear()
-		@data = foo : 'value'
-		setFixtures '<script id="foo" type="template">My {{foo}}</script>'
+	describe "when using script tag as template", ->
+		beforeEach ->
+			Marionette.TemplateCache.clear()
+			@data = foo : 'bar'
+			setFixtures '<script id="foo" type="template">My {{foo}}</script>'
 
-	it 'must compile the template', ->
-		result = Marionette.Renderer.render '#foo', @data
-		expect result
-			.toEqual 'My value'
+		it 'must compile the template', ->
+			result = Marionette.Renderer.render '#foo', @data
+			expect 'My bar'
+				.toEqual result
+
+	describe "when entire template is passed as string", ->
+
+		beforeEach ->
+			@data = foo : 'bar'
+			@result = Marionette.Renderer.render '<p>{{foo}}</p>', @data
+
+		it 'must not cache the template', ->
+			expect Marionette.TemplateCache.templateCaches['<p>{{foo}}</p>']
+				.toBe undefined
+		it 'must compile the template', ->
+			expect '<p>bar</p>'
+				.toEqual @result
