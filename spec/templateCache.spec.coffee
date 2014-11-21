@@ -1,5 +1,5 @@
 
-describe "Marionette TemplateCache", ->
+describe "Marionette Templates and Cache", ->
 
 	describe "when using script tag as template", ->
 		beforeEach ->
