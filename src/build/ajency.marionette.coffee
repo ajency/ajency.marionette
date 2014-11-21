@@ -27,5 +27,6 @@
 	Ajency = {}
 
 	# @include ../templateCache.coffee
+	# @include ../currentUser.coffee
 
 	Ajency

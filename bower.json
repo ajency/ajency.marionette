@@ -21,6 +21,7 @@
     "mustache": "~0.8.2"
   },
   "devDependencies": {
-    "jasmine-jquery": "~2.0.5"
+    "jasmine-jquery": "~2.0.5",
+    "jasmine-ajax": "~2.99.0"
   }
 }

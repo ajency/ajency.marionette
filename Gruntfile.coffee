@@ -12,8 +12,8 @@ module.exports = (grunt) ->
 				src: "src/build/ajency.marionette.coffee"
 				dest: "tmp/ajency.marionette.coffee"
 			specs :
-				src : [ "spec/*.coffee" ]
-				dest : "tmp/ajency.marionette.spec.coffee"
+				src : [ "spec/ajency.marionette.specs.coffee" ]
+				dest : "tmp/ajency.marionette.specs.coffee"
 
 
 		# produce index.html by target
@@ -23,12 +23,12 @@ module.exports = (grunt) ->
 			compile :
 				files :
 					"tmp/ajency.marionette.js" : "tmp/ajency.marionette.coffee"
-					"tmp/ajency.marionette.spec.js" : "tmp/ajency.marionette.spec.coffee"
+					"tmp/ajency.marionette.specs.js" : "tmp/ajency.marionette.specs.coffee"
 
 		jasmine:
 			test:
 				options:
-					specs: 'tmp/ajency.marionette.spec.js'
+					specs: 'tmp/ajency.marionette.specs.js'
 				src: [
 					'bower_components/underscore/underscore.js'
 					'bower_components/jquery/dist/jquery.js'
@@ -36,6 +36,7 @@ module.exports = (grunt) ->
 					'bower_components/backbone.marionette/lib/backbone.marionette.js'
 					'bower_components/mustache/mustache.js'
 					'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
+					'bower_components/jasmine-ajax/lib/mock-ajax.js'
 					'tmp/ajency.marionette.js'
 				]
 
@@ -49,7 +50,6 @@ module.exports = (grunt) ->
 					"spec/**/*.coffee"
 				]
 				tasks: ["preprocess:build","preprocess:specs","coffee:compile", "jasmine:test"]
-
 
 
 	grunt.registerTask "dev","Start development", [
