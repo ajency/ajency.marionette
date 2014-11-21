@@ -27,6 +27,8 @@ module.exports = (grunt) ->
 
 		jasmine:
 			test:
+				options:
+					specs: 'tmp/ajency.marionette.spec.js'
 				src: [
 					'bower_components/underscore/underscore.js'
 					'bower_components/jquery/dist/jquery.js'
@@ -36,8 +38,6 @@ module.exports = (grunt) ->
 					'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					'tmp/ajency.marionette.js'
 				]
-				options:
-					specs: 'tmp/ajency.marionette.spec.js'
 
 		watch:
 			options:
