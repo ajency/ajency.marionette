@@ -29,4 +29,6 @@
 	# @include ../templateCache.coffee
 	# @include ../currentUser.coffee
 
+	# @include ../regionCtrl.coffee
+
 	Ajency
