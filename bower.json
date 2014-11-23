@@ -6,6 +6,7 @@
     "Suraj Air <suraj@ajency.in>"
   ],
   "license": "MIT",
+  "main": "dist/ajency.marionette.js",
   "ignore": [
     "**/.*",
     "node_modules",

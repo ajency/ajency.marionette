@@ -24,6 +24,9 @@ module.exports = (grunt) ->
 				files :
 					"tmp/ajency.marionette.js" : "tmp/ajency.marionette.coffee"
 					"tmp/ajency.marionette.specs.js" : "tmp/ajency.marionette.specs.coffee"
+			distribution :
+				files :
+					"dist/ajency.marionette.js" : "tmp/ajency.marionette.coffee"
 
 		jasmine:
 			test:
@@ -54,7 +57,15 @@ module.exports = (grunt) ->
 
 	grunt.registerTask "dev","Start development", [
 		"preprocess"
-		"coffee"
+		"coffee:compile"
 		"jasmine:test"
 		"watch"
 	]
+
+	grunt.registerTask "dist", "Create distribution build", [
+		"preprocess"
+		"coffee:compile"
+		"jasmine:test"
+		"coffee:distribution"
+	]
+
