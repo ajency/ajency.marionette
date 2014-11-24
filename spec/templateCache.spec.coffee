@@ -5,10 +5,10 @@ describe "Marionette Templates and Cache", ->
 		beforeEach ->
 			Marionette.TemplateCache.clear()
 			@data = foo : 'bar'
-			setFixtures '<script id="foo" type="template">My {{foo}}</script>'
+			setFixtures '<script id="foo-template" type="m-template">My {{foo}}</script>'
 
 		it 'must compile the template', ->
-			result = Marionette.Renderer.render '#foo', @data
+			result = Marionette.Renderer.render '#foo-template', @data
 			expect 'My bar'
 				.toEqual result
 

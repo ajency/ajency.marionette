@@ -16,8 +16,8 @@ Mustache.compile = (template)->
 _.extend Marionette.TemplateCache,
 
 	get : (template)->
-		mayBeTemplateId = template.indexOf('<') is -1
-		if not mayBeTemplateId or Backbone.$(template).length is 0
+		templateId = template.substr(template.length - 8) is 'template'
+		if not templateId
 			return Marionette.TemplateCache::nonScriptTemplate template
 
 		templateId = template
