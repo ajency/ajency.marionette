@@ -33,11 +33,13 @@ describe 'Ajency.LoginView', ->
 		$(view.ui.userLogin).val 'admin'
 		$(view.ui.userPass).val 'admin'
 		$(view.ui.loginBtn).trigger 'click'
-		expect(currentUser.authenticate).toHaveBeenCalledWith user_login : 'admin', user_pass : 'admin'
+		expect(currentUser.authenticate).toHaveBeenCalledWith
+							user_login : 'admin', user_pass : 'admin'
 
 	it 'must call onUserAuthFailed() if authentication fails', ->
 		view.onUserAuthFailed = ->
 		spyOn(view, 'onUserAuthFailed')
 		currentUser.trigger 'user:auth:failed', error : true, message : 'mesage'
-		expect(view.onUserAuthFailed).toHaveBeenCalledWith error : true, message : 'mesage'
+		expect(view.onUserAuthFailed).toHaveBeenCalledWith
+							error : true, message : 'mesage'
 
