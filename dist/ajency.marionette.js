@@ -24,17 +24,11 @@ var __hasProp = {}.hasOwnProperty,
   "use strict";
   var Ajency;
   Ajency = {};
-  Mustache.compile = function(template) {
-    Mustache.parse(template);
-    return function(view, partials) {
-      return Mustache.render(template, view, partials);
-    };
-  };
   _.extend(Marionette.TemplateCache, {
     get: function(template) {
-      var cachedTemplate, mayBeTemplateId, templateId;
-      mayBeTemplateId = template.indexOf('<') === -1;
-      if (!mayBeTemplateId || Backbone.$(template).length === 0) {
+      var cachedTemplate, templateId;
+      templateId = template.substr(template.length - 8) === 'template';
+      if (!templateId) {
         return Marionette.TemplateCache.prototype.nonScriptTemplate(template);
       }
       templateId = template;
@@ -51,7 +45,7 @@ var __hasProp = {}.hasOwnProperty,
       return this.compileTemplate(template);
     },
     compileTemplate: function(rawTemplate) {
-      return Mustache.compile(rawTemplate);
+      return Handlebars.compile(rawTemplate);
     }
   });
   Ajency.CurrentUser = (function(_super) {
