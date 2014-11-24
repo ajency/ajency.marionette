@@ -8,8 +8,8 @@
 			"underscore"
 			"backbone.marionette"
 			"mustache"
-		], (Backbone, _) ->
-			root.Ajency = factory(root, Backbone, _)
+		], (Backbone, _, Marionette, Mustache) ->
+			root.Ajency = factory(root, Backbone, _, Marionette, Mustache)
 
 	else if typeof exports isnt "undefined"
 		Backbone = require("backbone")
@@ -30,5 +30,6 @@
 	# @include ../currentUser.coffee
 
 	# @include ../regionCtrl.coffee
+	# @include ../loginCtrl.coffee
 
 	Ajency

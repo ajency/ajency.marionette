@@ -63,22 +63,13 @@ describe "Current User", ->
 
 		afterEach ->
 			clearCurrentUser()
-
-		it 'must resolve with true if already logged in', (done)->
-			setCurrentUser()
-			details = user_name : 'admin', user_pass : 'pass'
-			deferred =  currentUser.authenticate details
-			deferred.done (response)->
-				expect response
-					.toBe true
-				done()
+			jasmine.Ajax.uninstall();
 
 		describe 'username/password login', ->
 			beforeEach ->
 				@details = user_name : 'admin', user_pass : 'pass'
 				@deferred = currentUser.authenticate @details
 				@request = jasmine.Ajax.requests.mostRecent()
-				@request.respondWith true
 
 			it 'must make request to /authenticate url', ->
 				expect(@request.url).toBe "#{APIURL}/authenticate"
@@ -88,24 +79,61 @@ describe "Current User", ->
 				reqParams = user_name: [ 'admin' ], user_pass: [ 'pass' ]
 				expect(@request.data()).toEqual reqParams
 
-		describe 'Facebook authentication', ->
+		describe 'On successfull authentication', ->
 			beforeEach ->
-				spyOn(FB, 'login').and.callFake (cb)->
-						cb authResponse : true
+				details = user_name : 'admin', user_pass : 'pass'
+				spyOn(currentUser, 'trigger').and.callThrough()
+				currentUser.authenticate details
+				request = jasmine.Ajax.requests.mostRecent()
+				request.respondWith MockResponses.authSuccess
 
-				@deferred = currentUser.authenticate 'facebook', scope: 'email'
-				@request = jasmine.Ajax.requests.mostRecent()
+			afterEach ->
+				jasmine.Ajax.requests.reset()
 
-			it 'must call FB.login', ->
-				expect(FB.login).toHaveBeenCalled()
-			it 'must make request to /authenticate url', ->
-				expect(@request.url).toBe "#{APIURL}/authenticate"
-			it 'request method must be POST', ->
-				expect(@request.method).toBe 'POST'
-			it 'must make request with params', ->
-				reqParams = type: [ 'facebook' ], user_email: [ 'someemail@mail.com' ]
-				expect(@request.data()).toEqual reqParams
+			it 'must login the currentUser', ->
+				expect(currentUser.isLoggedIn()).toBe true
 
+			it 'currenUser must trigger event', ->
+				expect(currentUser.trigger).toHaveBeenCalledWith 'user:auth:success', currentUser
+
+		describe 'On failed authentication', ->
+
+			beforeEach ->
+				details = user_name : 'admin', user_pass : 'pass'
+				currentUser.authenticate details
+				request = jasmine.Ajax.requests.mostRecent()
+				spyOn(currentUser, 'trigger').and.callThrough()
+				request.respondWith MockResponses.authError
+
+			afterEach ->
+				jasmine.Ajax.requests.reset()
+
+			it 'currenUser must trigger event', ->
+				expect(currentUser.trigger).toHaveBeenCalled()
+
+			it 'login status must be false', ->
+				expect(currentUser.isLoggedIn()).toBe false
+
+
+
+
+# describe 'Facebook authentication', ->
+		# 	beforeEach ->
+		# 		spyOn(FB, 'login').and.callFake (cb)->
+		# 				cb authResponse : true
+
+		# 		@deferred = currentUser.authenticate 'facebook', scope: 'email'
+		# 		@request = jasmine.Ajax.requests.mostRecent()
+
+		# 	it 'must call FB.login()', ->
+		# 		expect(FB.login).toHaveBeenCalled()
+		# 	it 'must make request to /authenticate url', ->
+		# 		expect(@request.url).toBe "#{APIURL}/authenticate"
+		# 	it 'request method must be POST', ->
+		# 		expect(@request.method).toBe 'POST'
+		# 	it 'must make request with params', ->
+		# 		reqParams = type: [ 'facebook' ], user_email: [ 'someemail@mail.com' ]
+		# 		expect(@request.data()).toEqual reqParams
 
 
 

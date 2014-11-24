@@ -2,7 +2,7 @@
 window.FB =
 	login : ->
 	api : (url, cb)->
-		cb email : 'someemail@mail.com'
+		cb email : "someemail@mail.com"
 
 # define API URL
 window.APIURL = 'http://localhost/project/wp-api'
@@ -31,3 +31,11 @@ afterEach ->
 	window.location.hash = ''
 	Backbone.history.stop()
 	Backbone.history.handlers.length = 0
+
+window.MockResponses =
+	authSuccess :
+		status : 200
+		responseText : '{"ID": 1,"user_name": "admin","user_email": "admin@mailinator.com","display_name": "Admin User"}'
+	authError :
+		status : 200
+		responseText : '{"error": true, "message" : "Invalid username or password"}'

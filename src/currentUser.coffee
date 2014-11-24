@@ -5,6 +5,7 @@
 # API:
 #  - isLoggedIn()
 #  - hasCap()
+
 class Ajency.CurrentUser extends Backbone.Model
 
 	defaults : ->
@@ -21,28 +22,29 @@ class Ajency.CurrentUser extends Backbone.Model
 		return false
 
 	authenticate : (args...)->
-		deferred = new Marionette.Deferred()
-		if @isLoggedIn()
-			deferred.resolve true
-			return deferred.promise()
+		_currentUser = @
+
+		if @isLoggedIn() then return
 
 		if _.isObject args[0]
-			$.post "#{APIURL}/authenticate", args[0], ->
-				deferred.resolve true
+			responseFn = (response)->
+				if not _.isUndefined(response.error) and response.error is true
+					_currentUser.trigger 'user:auth:failed', response
+				else
+					_currentUser.set response
+					_currentUser.trigger 'user:auth:success', _currentUser
 
-		if _.isString(args[0]) and args[0] is 'facebook'
-			FB.login (response)->
-				if response.authResponse
-					FB.api '/me', (response)->
-						data =
-							type : 'facebook'
-							user_email : response.email
-						$.post "#{APIURL}/authenticate", data , ->
-							deferred.resolve true
+			$.post "#{APIURL}/authenticate", args[0], responseFn, 'json'
 
-		deferred.promise()
-
-
+		# if _.isString(args[0]) and args[0] is 'facebook'
+		# 	FB.login (response)->
+		# 		if response.authResponse
+		# 			FB.api '/me', (response)->
+		# 				data =
+		# 					type : 'facebook'
+		# 					user_email : response.email
+		# 				$.post "#{APIURL}/authenticate", data , ->
+		# 					deferred.resolve true
 
 # define the logged in user single ton
 window.currentUser = new Ajency.CurrentUser
