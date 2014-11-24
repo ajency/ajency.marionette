@@ -1,6 +1,6 @@
 
 # Login View
-class LoginView extends Marionette.ItemView
+class Ajency.LoginView extends Marionette.ItemView
 
 	template : '#login-template'
 
@@ -19,11 +19,11 @@ class LoginView extends Marionette.ItemView
 			@triggerMethod 'user:auth:failed', response
 
 	loginWithFB : ->
-			currentUser.authenticate 'facebook'
+		currentUser.authenticate 'facebook'
 
 	loginDefault : ->
 		data =
-			user_name : @ui.userLogin.val()
+			user_login : @ui.userLogin.val()
 			user_pass : @ui.userPass.val()
 		currentUser.authenticate data
 
@@ -32,5 +32,5 @@ class LoginView extends Marionette.ItemView
 class Ajency.LoginCtrl extends Ajency.RegionController
 
 	initialize : ->
-		@_view  = new LoginView
+		@_view  = new Ajency.LoginView
 		@show @_view
