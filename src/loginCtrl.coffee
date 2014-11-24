@@ -7,6 +7,8 @@ class LoginView extends Marionette.ItemView
 	ui :
 		'loginBtn' : '#btn-login'
 		'fbLoginBtn' : '#btn-fblogin'
+		'userLogin' : 'input[name="user_login"]'
+		'userPass' : 'input[name="user_pass"]'
 
 	events :
 		'click @ui.fbLoginBtn' : 'loginWithFB'
@@ -16,13 +18,13 @@ class LoginView extends Marionette.ItemView
 		@listenTo currentUser, 'user:auth:failed', (response)->
 			@triggerMethod 'user:auth:failed', response
 
-	loginWithFB : (options = {})->
-		currentUser.authenticate 'facebook', options
+	loginWithFB : ->
+			currentUser.authenticate 'facebook'
 
-	loginDefault : (options = {})->
+	loginDefault : ->
 		data =
-			user_name : 'admin'
-			user_pass : 'password'
+			user_name : @ui.userLogin.val()
+			user_pass : @ui.userPass.val()
 		currentUser.authenticate data
 
 

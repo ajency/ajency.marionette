@@ -11,7 +11,7 @@ window.APIURL = 'http://localhost/project/wp-api'
 setCurrentUser = ->
 	userData =
 		ID : 1
-		user_name : 'admin'
+		user_login : 'admin'
 		user_email : 'admin@mailinator.com'
 		caps :
 			edit_post : true
@@ -35,7 +35,7 @@ afterEach ->
 window.MockResponses =
 	authSuccess :
 		status : 200
-		responseText : '{"ID": 1,"user_name": "admin","user_email": "admin@mailinator.com","display_name": "Admin User"}'
+		responseText : '{"ID": 1,"user_login": "admin","user_email": "admin@mailinator.com","display_name": "Admin User"}'
 	authError :
 		status : 200
 		responseText : '{"error": true, "message" : "Invalid username or password"}'
