@@ -3,24 +3,24 @@ var __hasProp = {}.hasOwnProperty,
   __slice = [].slice;
 
 (function(root, factory) {
-  var Backbone, Marionette, Mustache, _;
+  var Backbone, Handlebars, Marionette, _;
   Backbone = void 0;
   Marionette = void 0;
   _ = void 0;
   if (typeof define === "function" && define.amd) {
-    return define(["backbone", "underscore", "backbone.marionette", "mustache"], function(Backbone, _) {
-      return root.Ajency = factory(root, Backbone, _);
+    return define(["backbone", "underscore", "backbone.marionette", "handlebars"], function(Backbone, _, Marionette, Handlebars) {
+      return root.Ajency = factory(root, Backbone, _, Marionette, Handlebars);
     });
   } else if (typeof exports !== "undefined") {
     Backbone = require("backbone");
     _ = require("underscore");
     Marionette = require("backbone.marionette");
-    Mustache = require("mustache");
-    return module.Ajency = factory(root, Backbone, _, Marionette, Mustache);
+    Handlebars = require("handlebars");
+    return module.Ajency = factory(root, Backbone, _, Marionette, Handlebars);
   } else {
-    return root.Ajency = factory(root, root.Backbone, root._, root.Marionette, root.Mustache);
+    return root.Ajency = factory(root, root.Backbone, root._, root.Marionette, root.Handlebars);
   }
-})(this, function(root, Backbone, _, Marionette, Mustache) {
+})(this, function(root, Backbone, _, Marionette, Handlebars) {
   "use strict";
   var Ajency;
   Ajency = {};
@@ -79,69 +79,143 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     CurrentUser.prototype.authenticate = function() {
-      var args, deferred;
+      var args, responseFn, _currentUser;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      deferred = new Marionette.Deferred();
+      _currentUser = this;
       if (this.isLoggedIn()) {
-        deferred.resolve(true);
-        return deferred.promise();
+        return;
       }
       if (_.isObject(args[0])) {
-        $.post("" + APIURL + "/authenticate", args[0], function() {
-          return deferred.resolve(true);
-        });
-      }
-      if (_.isString(args[0]) && args[0] === 'facebook') {
-        FB.login(function(response) {
-          if (response.authResponse) {
-            return FB.api('/me', function(response) {
-              var data;
-              data = {
-                type: 'facebook',
-                user_email: response.email
-              };
-              return $.post("" + APIURL + "/authenticate", data, function() {
-                return deferred.resolve(true);
-              });
-            });
+        responseFn = function(response) {
+          if (!_.isUndefined(response.error) && response.error === true) {
+            return _currentUser.trigger('user:auth:failed', response);
+          } else {
+            _currentUser.set(response);
+            return _currentUser.trigger('user:auth:success', _currentUser);
           }
-        });
+        };
+        return $.post("" + APIURL + "/authenticate", args[0], responseFn, 'json');
       }
-      return deferred.promise();
     };
 
     return CurrentUser;
 
   })(Backbone.Model);
   window.currentUser = new Ajency.CurrentUser;
+  Ajency.NoAccessView = (function(_super) {
+    __extends(NoAccessView, _super);
+
+    function NoAccessView() {
+      return NoAccessView.__super__.constructor.apply(this, arguments);
+    }
+
+    NoAccessView.prototype.template = '#no-access-template';
+
+    return NoAccessView;
+
+  })(Marionette.ItemView);
   Ajency.RegionController = (function(_super) {
     __extends(RegionController, _super);
 
     function RegionController(options) {
+      var hasAccess;
       if (options == null) {
         options = {};
       }
       if (!options.region || (options.region instanceof Marionette.Region !== true)) {
         throw new Marionette.Error({
-          message: 'region instance is not passed'
+          message: 'Region instance is not passed'
         });
       }
-      this._ctrlID = _.uniqueId("ctrl-");
+      this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
+      hasAccess = this.confirmAccess(options.stateName);
+      if (hasAccess !== true) {
+        this._view = new Ajency.NoAccessView({
+          type: 'type1'
+        });
+        this.listenTo(this._view, 'show', (function(_this) {
+          return function() {
+            return _.delay(function() {
+              return _this.trigger('view:rendered', _this._view);
+            }, 100);
+          };
+        })(this));
+        this.show(this._view);
+        return;
+      }
       RegionController.__super__.constructor.call(this, options);
     }
 
-    RegionController.prototype.show = function(view) {
-      if (view instanceof Backbone.View !== true) {
-        throw new Marionette.Error({
-          message: 'view instance is not passed'
-        });
-      }
-      return this._region.show(view);
+    RegionController.prototype.confirmAccess = function(stateName) {
+      var currentUser;
+      currentUser = window.currentUser;
+      return currentUser.hasCap("access_" + stateName);
     };
 
     return RegionController;
 
-  })(Marionette.Controller);
+  })(Marionette.RegionController);
+  Ajency.LoginView = (function(_super) {
+    __extends(LoginView, _super);
+
+    function LoginView() {
+      return LoginView.__super__.constructor.apply(this, arguments);
+    }
+
+    LoginView.prototype.template = '#login-template';
+
+    LoginView.prototype.ui = {
+      'loginBtn': '#btn-login',
+      'fbLoginBtn': '#btn-fblogin',
+      'userLogin': 'input[name="user_login"]',
+      'userPass': 'input[name="user_pass"]'
+    };
+
+    LoginView.prototype.events = {
+      'click @ui.fbLoginBtn': 'loginWithFB',
+      'click @ui.loginBtn': 'loginDefault'
+    };
+
+    LoginView.prototype.initialize = function(options) {
+      if (options == null) {
+        options = {};
+      }
+      return this.listenTo(currentUser, 'user:auth:failed', function(response) {
+        return this.triggerMethod('user:auth:failed', response);
+      });
+    };
+
+    LoginView.prototype.loginWithFB = function() {
+      return currentUser.authenticate('facebook');
+    };
+
+    LoginView.prototype.loginDefault = function() {
+      var data;
+      data = {
+        user_login: this.ui.userLogin.val(),
+        user_pass: this.ui.userPass.val()
+      };
+      return currentUser.authenticate(data);
+    };
+
+    return LoginView;
+
+  })(Marionette.ItemView);
+  Ajency.LoginCtrl = (function(_super) {
+    __extends(LoginCtrl, _super);
+
+    function LoginCtrl() {
+      return LoginCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    LoginCtrl.prototype.initialize = function() {
+      this._view = new Ajency.LoginView;
+      return this.show(this._view);
+    };
+
+    return LoginCtrl;
+
+  })(Ajency.RegionController);
   return Ajency;
 });
