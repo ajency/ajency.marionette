@@ -7,20 +7,20 @@
 			"backbone"
 			"underscore"
 			"backbone.marionette"
-			"mustache"
-		], (Backbone, _, Marionette, Mustache) ->
-			root.Ajency = factory(root, Backbone, _, Marionette, Mustache)
+			"handlebars"
+		], (Backbone, _, Marionette, Handlebars) ->
+			root.Ajency = factory(root, Backbone, _, Marionette, Handlebars)
 
 	else if typeof exports isnt "undefined"
 		Backbone = require("backbone")
 		_ = require("underscore")
 		Marionette = require("backbone.marionette")
-		Mustache = require("mustache")
-		module.Ajency = factory(root, Backbone, _, Marionette, Mustache)
+		Handlebars = require("handlebars")
+		module.Ajency = factory(root, Backbone, _, Marionette, Handlebars)
 	else
-		root.Ajency = factory(root, root.Backbone, root._, root.Marionette, root.Mustache)
+		root.Ajency = factory(root, root.Backbone, root._, root.Marionette, root.Handlebars)
 
-) this, (root, Backbone, _, Marionette, Mustache) ->
+) this, (root, Backbone, _, Marionette, Handlebars) ->
 	"use strict"
 
 	# the root object of the plugin
