@@ -24,6 +24,7 @@ clearCurrentUser = ->
 	window.currentUser.clear()
 
 beforeEach ->
+	setFixtures '<script type="h-template" id="no-access-template">No Access</script>'
 	this.setFixtures   = setFixtures
 	this.loadFixtures  = loadFixtures
 

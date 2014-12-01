@@ -1,9 +1,8 @@
 describe 'Ajency.RegionController', ->
 	_region = null
 	beforeEach ->
-		sandbox()
+		setFixtures sandbox()
 		_region =  new Marionette.Region el : '#sandbox'
-
 
 	describe 'on construction of object', ->
 		it 'must throw error if region not passed', ->
@@ -22,7 +21,6 @@ describe 'Ajency.RegionController', ->
 	describe "showing a view in region", ->
 
 		beforeEach ->
-			setFixtures sandbox()
 			@sandboxRegion =  new Marionette.Region el : '#sandbox'
 			@ctrl  = new Ajency.RegionController region : @sandboxRegion
 
@@ -33,5 +31,31 @@ describe 'Ajency.RegionController', ->
 			view  = new Marionette.ItemView 'template' : 'My View'
 			@ctrl.show view
 			expect(@sandboxRegion.currentView).toBe view
+
+	describe 'when checking if currentUser has capability to access state', ->
+
+		beforeEach ->
+			@ctrl  = new Ajency.RegionController region : _region, stateName : 'name'
+
+		describe 'When user does not have capability', ->
+
+			beforeEach ->
+				spyOn(currentUser, 'hasCap').and.returnValue false
+
+			it 'must call showNoAccessView', ->
+				expect(@ctrl.confirmAccess()).toBe false
+
+		describe 'When user does not have capability', ->
+
+			beforeEach ->
+				spyOn(currentUser, 'hasCap').and.returnValue false
+
+			it 'must call showNoAccessView', ->
+				expect(@ctrl.confirmAccess('name')).toBe false
+
+
+
+
+
 
 
