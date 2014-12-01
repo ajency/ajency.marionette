@@ -102,35 +102,60 @@ var __hasProp = {}.hasOwnProperty,
 
   })(Backbone.Model);
   window.currentUser = new Ajency.CurrentUser;
+  Ajency.NoAccessView = (function(_super) {
+    __extends(NoAccessView, _super);
+
+    function NoAccessView() {
+      return NoAccessView.__super__.constructor.apply(this, arguments);
+    }
+
+    NoAccessView.prototype.template = '#no-access-template';
+
+    return NoAccessView;
+
+  })(Marionette.ItemView);
   Ajency.RegionController = (function(_super) {
     __extends(RegionController, _super);
 
     function RegionController(options) {
+      var hasAccess;
       if (options == null) {
         options = {};
       }
       if (!options.region || (options.region instanceof Marionette.Region !== true)) {
         throw new Marionette.Error({
-          message: 'region instance is not passed'
+          message: 'Region instance is not passed'
         });
       }
-      this._ctrlID = _.uniqueId("ctrl-");
+      this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
+      hasAccess = this.confirmAccess(options.stateName);
+      if (hasAccess !== true) {
+        this._view = new Ajency.NoAccessView({
+          type: 'type1'
+        });
+        this.listenTo(this._view, 'show', (function(_this) {
+          return function() {
+            return _.delay(function() {
+              return _this.trigger('view:rendered', _this._view);
+            }, 100);
+          };
+        })(this));
+        this.show(this._view);
+        return;
+      }
       RegionController.__super__.constructor.call(this, options);
     }
 
-    RegionController.prototype.show = function(view) {
-      if (view instanceof Backbone.View !== true) {
-        throw new Marionette.Error({
-          message: 'view instance is not passed'
-        });
-      }
-      return this._region.show(view);
+    RegionController.prototype.confirmAccess = function(stateName) {
+      var currentUser;
+      currentUser = window.currentUser;
+      return currentUser.hasCap("access_" + stateName);
     };
 
     return RegionController;
 
-  })(Marionette.Controller);
+  })(Marionette.RegionController);
   Ajency.LoginView = (function(_super) {
     __extends(LoginView, _super);
 
