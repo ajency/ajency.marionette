@@ -37,6 +37,7 @@ module.exports = (grunt) ->
 					'bower_components/jquery/dist/jquery.js'
 					'bower_components/backbone/backbone.js'
 					'bower_components/backbone.marionette/lib/backbone.marionette.js'
+					'bower_components/marionette.state/dist/marionette.state.js'
 					'bower_components/handlebars/handlebars.js'
 					'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					'bower_components/jasmine-ajax/lib/mock-ajax.js'
@@ -65,7 +66,7 @@ module.exports = (grunt) ->
 	grunt.registerTask "dist", "Create distribution build", [
 		"preprocess"
 		"coffee:compile"
-		"jasmine:test"
+		#"jasmine:test"
 		"coffee:distribution"
 	]
 
