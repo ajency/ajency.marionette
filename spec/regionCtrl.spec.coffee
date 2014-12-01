@@ -5,6 +5,9 @@ describe 'Ajency.RegionController', ->
 		_region =  new Marionette.Region el : '#sandbox'
 
 	describe 'on construction of object', ->
+		beforeEach ->
+			spyOn(Ajency.RegionController::,'confirmAccess').and.returnValue true
+
 		it 'must throw error if region not passed', ->
 			expect( -> new Ajency.RegionController() ).toThrow()
 			expect( -> new Ajency.RegionController region : 'not a region object' ).toThrow()
@@ -21,6 +24,7 @@ describe 'Ajency.RegionController', ->
 	describe "showing a view in region", ->
 
 		beforeEach ->
+			spyOn(Ajency.RegionController::,'confirmAccess').and.returnValue true
 			@sandboxRegion =  new Marionette.Region el : '#sandbox'
 			@ctrl  = new Ajency.RegionController region : @sandboxRegion
 
@@ -32,28 +36,17 @@ describe 'Ajency.RegionController', ->
 			@ctrl.show view
 			expect(@sandboxRegion.currentView).toBe view
 
-	describe 'when checking if currentUser has capability to access state', ->
+	describe 'when getting the no access view', ->
 
 		beforeEach ->
-			@ctrl  = new Ajency.RegionController region : _region, stateName : 'name'
+			RCtrl = jasmine.createSpy(Ajency.RegionController)
+			ctrl = new RCtrl
+			@noAccessType = ctrl._getNoAccessType()
 
-		describe 'When user does not have capability', ->
+		describe 'When user is not logged in and capability is true', ->
 
-			beforeEach ->
-				spyOn(currentUser, 'hasCap').and.returnValue false
-
-			it 'must call showNoAccessView', ->
-				expect(@ctrl.confirmAccess()).toBe false
-
-		describe 'When user does not have capability', ->
-
-			beforeEach ->
-				spyOn(currentUser, 'hasCap').and.returnValue false
-
-			it 'must call showNoAccessView', ->
-				expect(@ctrl.confirmAccess('name')).toBe false
-
-
+			it 'muss return undefined', ->
+			  	expect(@noAccessType).toEqual 'notdefined'
 
 
 

@@ -8,6 +8,7 @@ describe 'Ajency.LoginCtrl', ->
 	describe 'on initialization', ->
 
 		beforeEach ->
+			spyOn(currentUser, 'hasCap').and.returnValue true
 			loadFixtures 'login-template.html'
 			appendSetFixtures sandbox()
 			@sandboxRegion =  new Marionette.Region el : '#sandbox'

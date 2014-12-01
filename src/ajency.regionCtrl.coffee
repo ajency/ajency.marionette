@@ -12,17 +12,26 @@ class Ajency.RegionController extends Marionette.RegionController
 
 		hasAccess = @confirmAccess options.stateName
 		if hasAccess isnt true
-			@_view = new Ajency.NoAccessView type : 'type1'
-			@listenTo @_view, 'show', =>
-								_.delay =>
-									@trigger 'view:rendered', @_view
-								, 100
-			@show @_view
+			capName = "access_#{options.stateName}"
+			type = 'noaccess'
+			@showNoAccessView type
 			return
 
 		super options
+
+	showNoAccessView : ->
+		@_view = new Ajency.NoAccessView type : 'type1'
+		@listenTo @_view, 'show', =>
+							_.delay =>
+								@trigger 'view:rendered', @_view
+							, 100
+		@show @_view
 
 
 	confirmAccess : (stateName)->
 		currentUser = window.currentUser
 		currentUser.hasCap "access_#{stateName}"
+
+	_getNoAccessType : ->
+		return 'notdefined'
+

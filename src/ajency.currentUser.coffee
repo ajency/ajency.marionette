@@ -21,6 +21,13 @@ class Ajency.CurrentUser extends Backbone.Model
 			return true
 		return false
 
+	capExists : (capName)->
+		if not @has('caps') then return false
+		caps = @get 'caps'
+		if not _.isUndefined(caps[capName])
+			return true
+		return false
+
 	authenticate : (args...)->
 		_currentUser = @
 
