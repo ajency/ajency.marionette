@@ -24,6 +24,57 @@ var __hasProp = {}.hasOwnProperty,
   "use strict";
   var Ajency;
   Ajency = {};
+  _.extend(Marionette.Application.prototype, {
+    appStates: {},
+    navigate: Backbone.Router.prototype.navigate,
+    state: function(name, def) {
+      if (def == null) {
+        def = {};
+      }
+      this.appStates[name] = def;
+      return this;
+    },
+    _registerStates: function() {
+      Marionette.RegionControllers.prototype.controllers = this;
+      _.extend(Marionette.AppStates.prototype, {
+        appStates: this.appStates
+      });
+      return new Marionette.AppStates({
+        app: this
+      });
+    },
+    start: function(options) {
+      if (options == null) {
+        options = {};
+      }
+      this.currentUser = window.currentUser;
+      this._detectRegions();
+      this._registerStates();
+      this.triggerMethod('before:start', options);
+      this._initCallbacks.run(options, this);
+      return this.triggerMethod('start', options);
+    },
+    controller: function(name, ctrlPrototype) {
+      var CtrlClass;
+      if (_.isFunction(ctrlPrototype)) {
+        CtrlClass = ctrlPrototype;
+      } else {
+        CtrlClass = (function(_super) {
+          __extends(CtrlClass, _super);
+
+          function CtrlClass() {
+            return CtrlClass.__super__.constructor.apply(this, arguments);
+          }
+
+          return CtrlClass;
+
+        })(Ajency.RegionController);
+        _.extend(CtrlClass.prototype, ctrlPrototype);
+      }
+      this[name] = CtrlClass;
+      return this;
+    }
+  });
   _.extend(Marionette.TemplateCache, {
     get: function(template) {
       var cachedTemplate, templateId;
@@ -173,7 +224,6 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     LoginView.prototype.events = {
-      'click @ui.fbLoginBtn': 'loginWithFB',
       'click @ui.loginBtn': 'loginDefault'
     };
 
@@ -184,10 +234,6 @@ var __hasProp = {}.hasOwnProperty,
       return this.listenTo(currentUser, 'user:auth:failed', function(response) {
         return this.triggerMethod('user:auth:failed', response);
       });
-    };
-
-    LoginView.prototype.loginWithFB = function() {
-      return currentUser.authenticate('facebook');
     };
 
     LoginView.prototype.loginDefault = function() {
