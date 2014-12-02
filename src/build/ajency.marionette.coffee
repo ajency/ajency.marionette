@@ -26,11 +26,11 @@
 	# the root object of the plugin
 	Ajency = {}
 
+	# @include ../ajency.application.coffee
 	# @include ../ajency.templateCache.coffee
 	# @include ../ajency.currentUser.coffee
 	# @include ../ajency.noaccess.coffee
 	# @include ../ajency.regionCtrl.coffee
 	# @include ../ajency.loginCtrl.coffee
-
 
 	Ajency

@@ -1,4 +1,3 @@
-
 # Login View
 class Ajency.LoginView extends Marionette.ItemView
 
@@ -11,15 +10,11 @@ class Ajency.LoginView extends Marionette.ItemView
 		'userPass' : 'input[name="user_pass"]'
 
 	events :
-		'click @ui.fbLoginBtn' : 'loginWithFB'
 		'click @ui.loginBtn' : 'loginDefault'
 
 	initialize : (options = {})->
 		@listenTo currentUser, 'user:auth:failed', (response)->
 			@triggerMethod 'user:auth:failed', response
-
-	loginWithFB : ->
-		currentUser.authenticate 'facebook'
 
 	loginDefault : ->
 		data =

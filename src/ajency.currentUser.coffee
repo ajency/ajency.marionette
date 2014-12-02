@@ -36,16 +36,6 @@ class Ajency.CurrentUser extends Backbone.Model
 
 			$.post "#{APIURL}/authenticate", args[0], responseFn, 'json'
 
-		# if _.isString(args[0]) and args[0] is 'facebook'
-		# 	FB.login (response)->
-		# 		if response.authResponse
-		# 			FB.api '/me', (response)->
-		# 				data =
-		# 					type : 'facebook'
-		# 					user_email : response.email
-		# 				$.post "#{APIURL}/authenticate", data , ->
-		# 					deferred.resolve true
-
 # define the logged in user single ton
 window.currentUser = new Ajency.CurrentUser
 
