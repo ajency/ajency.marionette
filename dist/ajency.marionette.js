@@ -22,10 +22,14 @@ var __hasProp = {}.hasOwnProperty,
   }
 })(this, function(root, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency;
+  var Ajency, NothingFoundView;
   Ajency = {};
   _.extend(Marionette.Application.prototype, {
-    appStates: {},
+    appStates: {
+      'NothingFound': {
+        url: '/*notFound'
+      }
+    },
     navigate: Backbone.Router.prototype.navigate,
     state: function(name, def) {
       if (def == null) {
@@ -129,6 +133,18 @@ var __hasProp = {}.hasOwnProperty,
       return false;
     };
 
+    CurrentUser.prototype.capExists = function(capName) {
+      var caps;
+      if (!this.has('caps')) {
+        return false;
+      }
+      caps = this.get('caps');
+      if (!_.isUndefined(caps[capName])) {
+        return true;
+      }
+      return false;
+    };
+
     CurrentUser.prototype.authenticate = function() {
       var args, responseFn, _currentUser;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -169,7 +185,7 @@ var __hasProp = {}.hasOwnProperty,
     __extends(RegionController, _super);
 
     function RegionController(options) {
-      var hasAccess;
+      var capName, hasAccess, type;
       if (options == null) {
         options = {};
       }
@@ -182,26 +198,36 @@ var __hasProp = {}.hasOwnProperty,
       this._region = options.region;
       hasAccess = this.confirmAccess(options.stateName);
       if (hasAccess !== true) {
-        this._view = new Ajency.NoAccessView({
-          type: 'type1'
-        });
-        this.listenTo(this._view, 'show', (function(_this) {
-          return function() {
-            return _.delay(function() {
-              return _this.trigger('view:rendered', _this._view);
-            }, 100);
-          };
-        })(this));
-        this.show(this._view);
+        capName = "access_" + options.stateName;
+        type = 'noaccess';
+        this.showNoAccessView(type);
         return;
       }
       RegionController.__super__.constructor.call(this, options);
     }
 
+    RegionController.prototype.showNoAccessView = function() {
+      this._view = new Ajency.NoAccessView({
+        type: 'type1'
+      });
+      this.listenTo(this._view, 'show', (function(_this) {
+        return function() {
+          return _.delay(function() {
+            return _this.trigger('view:rendered', _this._view);
+          }, 100);
+        };
+      })(this));
+      return this.show(this._view);
+    };
+
     RegionController.prototype.confirmAccess = function(stateName) {
       var currentUser;
       currentUser = window.currentUser;
       return currentUser.hasCap("access_" + stateName);
+    };
+
+    RegionController.prototype._getNoAccessType = function() {
+      return 'notdefined';
     };
 
     return RegionController;
@@ -263,5 +289,31 @@ var __hasProp = {}.hasOwnProperty,
     return LoginCtrl;
 
   })(Ajency.RegionController);
+  NothingFoundView = (function(_super) {
+    __extends(NothingFoundView, _super);
+
+    function NothingFoundView() {
+      return NothingFoundView.__super__.constructor.apply(this, arguments);
+    }
+
+    NothingFoundView.prototype.template = '#404-template';
+
+    return NothingFoundView;
+
+  })(Marionette.ItemView);
+  Ajency.NothingFoundCtrl = (function(_super) {
+    __extends(NothingFoundCtrl, _super);
+
+    function NothingFoundCtrl() {
+      return NothingFoundCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    NothingFoundCtrl.prototype.initialize = function() {
+      return this.show(new NothingFoundView);
+    };
+
+    return NothingFoundCtrl;
+
+  })(Marionette.RegionController);
   return Ajency;
 });
