@@ -1,5 +1,8 @@
 # Region controller
 
+class Ajency.NoAccessView extends Marionette.ItemView
+	template : '#no-access-template'
+
 class Ajency.RegionController extends Marionette.RegionController
 
 	constructor : (options = {})->

@@ -29,8 +29,8 @@
 	# @include ../ajency.application.coffee
 	# @include ../ajency.templateCache.coffee
 	# @include ../ajency.currentUser.coffee
-	# @include ../ajency.noaccess.coffee
-	# @include ../ajency.regionCtrl.coffee
-	# @include ../ajency.loginCtrl.coffee
+	# @include ../ajency.region.ctrl.coffee
+	# @include ../ajency.login.ctrl.coffee
+	# @include ../ajency.notfound.ctrl.coffee
 
 	Ajency

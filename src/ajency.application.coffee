@@ -1,6 +1,7 @@
 _.extend Marionette.Application::,
 
-	appStates : {}
+	appStates :
+		'NothingFound' : url : '/*notFound'
 
 	navigate : Backbone.Router::navigate
 
