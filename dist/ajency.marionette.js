@@ -146,16 +146,18 @@ var __hasProp = {}.hasOwnProperty,
     };
 
     CurrentUser.prototype.authenticate = function() {
-      var args, responseFn, _currentUser;
+      var args, responseFn, _currentUser, _this;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       _currentUser = this;
       if (this.isLoggedIn()) {
         return;
       }
+      _this = this;
       if (_.isObject(args[0])) {
         responseFn = function(response) {
           if (!_.isUndefined(response.error) && response.error === true) {
-            return _currentUser.trigger('user:auth:failed', response);
+            _currentUser.trigger('user:auth:failed', response);
+            return _this.triggerMethod('user:auth:failed', response);
           } else {
             _currentUser.set(response);
             return _currentUser.trigger('user:auth:success', _currentUser);
@@ -178,6 +180,19 @@ var __hasProp = {}.hasOwnProperty,
 
     NoAccessView.prototype.template = '#no-access-template';
 
+    NoAccessView.prototype.initialize = function(options) {
+      if (options == null) {
+        options = {};
+      }
+      return this.type = options.type, options;
+    };
+
+    NoAccessView.prototype.mixinTemplateHelpers = function(data) {
+      data = NoAccessView.__super__.mixinTemplateHelpers.call(this, data);
+      data[this.type] = true;
+      return data;
+    };
+
     return NoAccessView;
 
   })(Marionette.ItemView);
@@ -185,7 +200,7 @@ var __hasProp = {}.hasOwnProperty,
     __extends(RegionController, _super);
 
     function RegionController(options) {
-      var capName, hasAccess, type;
+      var capName;
       if (options == null) {
         options = {};
       }
@@ -196,38 +211,32 @@ var __hasProp = {}.hasOwnProperty,
       }
       this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
-      hasAccess = this.confirmAccess(options.stateName);
-      if (hasAccess !== true) {
-        capName = "access_" + options.stateName;
-        type = 'noaccess';
-        this.showNoAccessView(type);
-        return;
+      capName = "access_" + options.stateName;
+      if (App.currentUser.hasCap(capName)) {
+        RegionController.__super__.constructor.call(this, options);
+      } else {
+        this._showNoAccessView(capName);
       }
-      RegionController.__super__.constructor.call(this, options);
     }
 
-    RegionController.prototype.showNoAccessView = function() {
-      this._view = new Ajency.NoAccessView({
-        type: 'type1'
-      });
-      this.listenTo(this._view, 'show', (function(_this) {
-        return function() {
-          return _.delay(function() {
-            return _this.trigger('view:rendered', _this._view);
-          }, 100);
-        };
-      })(this));
-      return this.show(this._view);
+    RegionController.prototype._showNoAccessView = function(capName) {
+      var _type;
+      _type = this._getNoAccessType(capName);
+      return this.show(new Ajency.NoAccessView({
+        type: _type
+      }));
     };
 
-    RegionController.prototype.confirmAccess = function(stateName) {
-      var currentUser;
-      currentUser = window.currentUser;
-      return currentUser.hasCap("access_" + stateName);
-    };
-
-    RegionController.prototype._getNoAccessType = function() {
-      return 'notdefined';
+    RegionController.prototype._getNoAccessType = function(capName) {
+      var _type;
+      if (!App.currentUser.capExists(capName)) {
+        _type = 'not_defined';
+      } else if (App.currentUser.capExists(capName) && !App.currentUser.isLoggedIn()) {
+        _type = 'no_access_login';
+      } else {
+        _type = 'no_access';
+      }
+      return _type;
     };
 
     return RegionController;
@@ -288,7 +297,7 @@ var __hasProp = {}.hasOwnProperty,
 
     return LoginCtrl;
 
-  })(Ajency.RegionController);
+  })(Marionette.RegionController);
   NothingFoundView = (function(_super) {
     __extends(NothingFoundView, _super);
 
