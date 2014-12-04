@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.1.0
+ * Version: v0.1.1
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -55,7 +55,7 @@ var __hasProp = {}.hasOwnProperty,
       _.extend(Marionette.AppStates.prototype, {
         appStates: this.appStates
       });
-      return new Marionette.AppStates({
+      return this.router = new Marionette.AppStates({
         app: this
       });
     },
@@ -183,6 +183,35 @@ var __hasProp = {}.hasOwnProperty,
 
   })(Backbone.Model);
   window.currentUser = new Ajency.CurrentUser;
+
+  /*
+  	 * Ajency.ActiveLinkBehavior
+   */
+  Ajency.ActiveLinkBehavior = (function(_super) {
+    __extends(ActiveLinkBehavior, _super);
+
+    function ActiveLinkBehavior() {
+      return ActiveLinkBehavior.__super__.constructor.apply(this, arguments);
+    }
+
+    ActiveLinkBehavior.prototype.defaults = function() {
+      return {
+        app: false
+      };
+    };
+
+    ActiveLinkBehavior.prototype.events = {
+      'click @ui.ul li': 'setActiveLink'
+    };
+
+    ActiveLinkBehavior.prototype.setActiveLink = function(evt) {
+      $(evt.currentTarget).siblings().removeClass('active');
+      return $(evt.currentTarget).addClass('active');
+    };
+
+    return ActiveLinkBehavior;
+
+  })(Marionette.Behavior);
   Ajency.NoAccessView = (function(_super) {
     __extends(NoAccessView, _super);
 

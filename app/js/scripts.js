@@ -1,4 +1,4 @@
-var HeaderView, SocialSingle,
+var HeaderView, LeftNavView, SocialSingle,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -145,6 +145,30 @@ App.HeaderCtrl = (function(_super) {
 
 })(Marionette.RegionController);
 
+LeftNavView = (function(_super) {
+  __extends(LeftNavView, _super);
+
+  function LeftNavView() {
+    return LeftNavView.__super__.constructor.apply(this, arguments);
+  }
+
+  LeftNavView.prototype.template = '<div><ul style="max-width: 300px;" class="nav nav-pills nav-stacked"> <li role="presentation"><a href="#/universities/23">universities</a></li> <li role="presentation"><a href="#/socities">socities</a></li> <li role="presentation"><a href="#/socities/23">socities one</a></li> </ul></div>';
+
+  LeftNavView.prototype.ui = {
+    ul: '.nav-pills'
+  };
+
+  LeftNavView.prototype.behaviors = {
+    ActiveLink: {
+      behaviorClass: Ajency.ActiveLinkBehavior,
+      app: App
+    }
+  };
+
+  return LeftNavView;
+
+})(Marionette.ItemView);
+
 App.LeftNavCtrl = (function(_super) {
   __extends(LeftNavCtrl, _super);
 
@@ -153,9 +177,7 @@ App.LeftNavCtrl = (function(_super) {
   }
 
   LeftNavCtrl.prototype.initialize = function() {
-    return this.show(new Marionette.ItemView({
-      template: '<div><ul style="max-width: 300px;" class="nav nav-pills nav-stacked"> <li class="active" role="presentation"><a href="#/universities/23">universities</a></li> <li role="presentation"><a href="#/socities">socities</a></li> <li role="presentation"><a href="#/socities/23">socities one</a></li> </ul></div>'
-    }));
+    return this.show(new LeftNavView);
   };
 
   return LeftNavCtrl;
@@ -187,7 +209,6 @@ App.SocitiesListCtrl = (function(_super) {
   }
 
   SocitiesListCtrl.prototype.initialize = function() {
-    this.abc = '123';
     return this.show(new Marionette.ItemView({
       template: '<div>Awesome SocitiesListCtrl <a href="#/universities/23">Go</a></div>'
     }));
@@ -205,6 +226,17 @@ SocialSingle = (function(_super) {
   }
 
   SocialSingle.prototype.template = '#socity-single-template';
+
+  SocialSingle.prototype.ui = {
+    ul: '.nav-pills'
+  };
+
+  SocialSingle.prototype.behaviors = {
+    ActiveLink: {
+      behaviorClass: Ajency.ActiveLinkBehavior,
+      app: App
+    }
+  };
 
   SocialSingle.prototype.onShow = function() {
     return this.$el.find('.nav-pills li a').first().trigger('click');

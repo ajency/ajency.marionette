@@ -119,13 +119,25 @@ class App.HeaderCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new HeaderView model : App.currentUser
 
+class LeftNavView extends Marionette.ItemView
+	template : '<div><ul style="max-width: 300px;" class="nav nav-pills nav-stacked">
+				  <li role="presentation"><a href="#/universities/23">universities</a></li>
+				  <li role="presentation"><a href="#/socities">socities</a></li>
+				  <li role="presentation"><a href="#/socities/23">socities one</a></li>
+				</ul></div>'
+
+	ui :
+		ul : '.nav-pills'
+
+	behaviors :
+		ActiveLink :
+			behaviorClass : Ajency.ActiveLinkBehavior
+			app : App
+
+
 class App.LeftNavCtrl extends Marionette.RegionController
 	initialize : ->
-		@show new Marionette.ItemView template : '<div><ul style="max-width: 300px;" class="nav nav-pills nav-stacked">
-	  <li class="active" role="presentation"><a href="#/universities/23">universities</a></li>
-	  <li role="presentation"><a href="#/socities">socities</a></li>
-	  <li role="presentation"><a href="#/socities/23">socities one</a></li>
-	</ul></div>'
+		@show new LeftNavView
 
 class App.UniversitieslistCtrl extends Marionette.RegionController
 	initialize : ->
@@ -135,12 +147,18 @@ class App.UniversitieslistCtrl extends Marionette.RegionController
 
 class App.SocitiesListCtrl extends Marionette.RegionController
 	initialize : ->
-		@abc = '123'
 		@show new Marionette.ItemView template : '<div>Awesome SocitiesListCtrl
 												<a href="#/universities/23">Go</a></div>'
 
 class SocialSingle extends Marionette.LayoutView
 	template : '#socity-single-template'
+	ui :
+		ul : '.nav-pills'
+
+	behaviors :
+		ActiveLink :
+			behaviorClass : Ajency.ActiveLinkBehavior
+			app : App
 	onShow : ->
 		@$el.find('.nav-pills li a').first().trigger 'click'
 
