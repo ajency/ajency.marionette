@@ -1,0 +1,13 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "respond": "~1.4.2",
+    "html5shiv": "~3.7.2",
+    "bootstrap": "~3.3.1",
+    "lesshat": "~3.0.2",
+    "marionette.state": "git@github.com:ajency/marionette.state.git#~0.1.0",
+    "handlebars": "~2.0.0"
+  }
+}

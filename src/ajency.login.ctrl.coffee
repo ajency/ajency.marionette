@@ -24,8 +24,7 @@ class Ajency.LoginView extends Marionette.ItemView
 
 
 # Login controller
-class Ajency.LoginCtrl extends Ajency.RegionController
-
+class Ajency.LoginCtrl extends Marionette.RegionController
 	initialize : ->
 		@_view  = new Ajency.LoginView
 		@show @_view

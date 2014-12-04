@@ -32,17 +32,18 @@ class Ajency.CurrentUser extends Backbone.Model
 		_currentUser = @
 
 		if @isLoggedIn() then return
-
+		_this = @
 		if _.isObject args[0]
 			responseFn = (response)->
 				if not _.isUndefined(response.error) and response.error is true
 					_currentUser.trigger 'user:auth:failed', response
+					_this.triggerMethod 'user:auth:failed', response
 				else
 					_currentUser.set response
 					_currentUser.trigger 'user:auth:success', _currentUser
 
 			$.post "#{APIURL}/authenticate", args[0], responseFn, 'json'
 
-# define the logged in user single ton
+# define the logged in user singleton
 window.currentUser = new Ajency.CurrentUser
 
