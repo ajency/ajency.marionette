@@ -3,7 +3,7 @@
 # Ajency.Marionette
 # https://github.com/ajency/ajency.marionette/wiki
 # --------------------------------------------------
-# Version: v0.1.2
+# Version: v0.1.3
 #
 # Copyright(c) 2014 Team Ajency, Ajency.in
 # Distributed under MIT license
@@ -38,9 +38,9 @@
 	# the root object of the plugin
 	Ajency = {}
 
-	# @include ../ajency.application.coffee
 	# @include ../ajency.templateCache.coffee
 	# @include ../ajency.currentUser.coffee
+	# @include ../ajency.application.coffee
 
 	# @include ../ajency.activelink.behavior.coffee
 

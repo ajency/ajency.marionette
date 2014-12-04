@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.1.2
+ * Version: v0.1.3
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -34,63 +34,8 @@ var __hasProp = {}.hasOwnProperty,
   }
 })(this, function(root, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency, NothingFoundView;
+  var Ajency, CurrentUser, NothingFoundView, currentUser;
   Ajency = {};
-  _.extend(Marionette.Application.prototype, {
-    appStates: {
-      'NothingFound': {
-        url: '/*notFound'
-      }
-    },
-    navigate: Backbone.Router.prototype.navigate,
-    state: function(name, def) {
-      if (def == null) {
-        def = {};
-      }
-      this.appStates[name] = def;
-      return this;
-    },
-    _registerStates: function() {
-      Marionette.RegionControllers.prototype.controllers = this;
-      _.extend(Marionette.AppStates.prototype, {
-        appStates: this.appStates
-      });
-      return this.router = new Marionette.AppStates({
-        app: this
-      });
-    },
-    start: function(options) {
-      if (options == null) {
-        options = {};
-      }
-      this.currentUser = window.currentUser;
-      this._detectRegions();
-      this._registerStates();
-      this.triggerMethod('before:start', options);
-      this._initCallbacks.run(options, this);
-      return this.triggerMethod('start', options);
-    },
-    controller: function(name, ctrlPrototype) {
-      var CtrlClass;
-      if (_.isFunction(ctrlPrototype)) {
-        CtrlClass = ctrlPrototype;
-      } else {
-        CtrlClass = (function(_super) {
-          __extends(CtrlClass, _super);
-
-          function CtrlClass() {
-            return CtrlClass.__super__.constructor.apply(this, arguments);
-          }
-
-          return CtrlClass;
-
-        })(Ajency.RegionController);
-        _.extend(CtrlClass.prototype, ctrlPrototype);
-      }
-      this[name] = CtrlClass;
-      return this;
-    }
-  });
   _.extend(Marionette.TemplateCache, {
     get: function(template) {
       var cachedTemplate, templateId;
@@ -115,7 +60,7 @@ var __hasProp = {}.hasOwnProperty,
       return Handlebars.compile(rawTemplate);
     }
   });
-  Ajency.CurrentUser = (function(_super) {
+  CurrentUser = (function(_super) {
     __extends(CurrentUser, _super);
 
     function CurrentUser() {
@@ -182,7 +127,42 @@ var __hasProp = {}.hasOwnProperty,
     return CurrentUser;
 
   })(Backbone.Model);
-  window.currentUser = new Ajency.CurrentUser;
+  currentUser = new CurrentUser;
+  _.extend(Marionette.Application.prototype, {
+    appStates: {
+      'NothingFound': {
+        url: '/*notFound'
+      }
+    },
+    navigate: Backbone.Router.prototype.navigate,
+    state: function(name, def) {
+      if (def == null) {
+        def = {};
+      }
+      this.appStates[name] = def;
+      return this;
+    },
+    _registerStates: function() {
+      Marionette.RegionControllers.prototype.controllers = this;
+      _.extend(Marionette.AppStates.prototype, {
+        appStates: this.appStates
+      });
+      return this.router = new Marionette.AppStates({
+        app: this
+      });
+    },
+    start: function(options) {
+      if (options == null) {
+        options = {};
+      }
+      this.currentUser = currentUser;
+      this._detectRegions();
+      this._registerStates();
+      this.triggerMethod('before:start', options);
+      this._initCallbacks.run(options, this);
+      return this.triggerMethod('start', options);
+    }
+  });
 
   /*
   	 * Ajency.ActiveLinkBehavior
@@ -253,7 +233,7 @@ var __hasProp = {}.hasOwnProperty,
       this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
       capName = "access_" + options.stateName;
-      if (window.currentUser.hasCap(capName)) {
+      if (currentUser.hasCap(capName)) {
         RegionController.__super__.constructor.call(this, options);
       } else {
         this._showNoAccessView(capName);
@@ -270,9 +250,9 @@ var __hasProp = {}.hasOwnProperty,
 
     RegionController.prototype._getNoAccessType = function(capName) {
       var _type;
-      if (!window.currentUser.capExists(capName)) {
+      if (!currentUser.capExists(capName)) {
         _type = 'not_defined';
-      } else if (window.currentUser.capExists(capName) && !window.currentUser.isLoggedIn()) {
+      } else if (currentUser.capExists(capName) && !currentUser.isLoggedIn()) {
         _type = 'no_access_login';
       } else {
         _type = 'no_access';

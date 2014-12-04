@@ -88,7 +88,6 @@ class App.LoginCtrl extends Marionette.RegionController
 
 class HeaderView extends Marionette.ItemView
 	template : '<div><nav role="navigation" class="navbar navbar-default navbar-static-top">
-		  <!-- We use the fluid option here to avoid overriding the fixed width of a normal container within the narrow content columns. -->
 		  <div class="container-fluid">
 			<div class="navbar-header">
 			  <button data-target="#bs-example-navbar-collapse-8" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
@@ -102,7 +101,6 @@ class HeaderView extends Marionette.ItemView
 			<div class="pull-right">
 				<div></div>
 			</div>
-			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div id="bs-example-navbar-collapse-8" class="collapse navbar-collapse">
 			  <ul class="nav navbar-nav">
 				<li class="active"><a href="#">Home</a></li>
@@ -112,8 +110,6 @@ class HeaderView extends Marionette.ItemView
 			</div><!-- /.navbar-collapse -->
 		  </div>
 		</nav></div>'
-
-
 
 class App.HeaderCtrl extends Marionette.RegionController
 	initialize : ->
@@ -133,7 +129,6 @@ class LeftNavView extends Marionette.ItemView
 		ActiveLink :
 			behaviorClass : Ajency.ActiveLinkBehavior
 			app : App
-
 
 class App.LeftNavCtrl extends Marionette.RegionController
 	initialize : ->
@@ -183,9 +178,7 @@ class App.UniversitiesSingleCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.ItemView template : '<div>Awesome UniversitiesSingleCtrl <a href="#/universities">Go</a></div>'
 
-
 jQuery(document).ready ($)->
-
 
 	class AppStates extends Marionette.AppStates
 
@@ -219,7 +212,6 @@ jQuery(document).ready ($)->
 			'socitiesTab3' :
 				parent : 'socitiesSingle'
 				url : '/tab3'
-
 
 	App.addInitializer ->
 		App.currentUser.set userData

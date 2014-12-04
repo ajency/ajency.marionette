@@ -15,20 +15,9 @@ _.extend Marionette.Application::,
 		@router = new Marionette.AppStates app : @
 
 	start : (options = {})->
-		@currentUser = window.currentUser
+		@currentUser = currentUser
 		@_detectRegions()
 		@_registerStates()
 		@triggerMethod 'before:start', options
 		@_initCallbacks.run options, @
 		@triggerMethod 'start', options
-
-	controller : (name, ctrlPrototype)->
-		if _.isFunction ctrlPrototype
-			CtrlClass = ctrlPrototype
-		else
-			class CtrlClass extends Ajency.RegionController
-			_.extend CtrlClass::, ctrlPrototype
-
-		@[name] = CtrlClass
-		@
-

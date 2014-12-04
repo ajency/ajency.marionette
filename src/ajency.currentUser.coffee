@@ -6,7 +6,7 @@
 #  - isLoggedIn()
 #  - hasCap()
 
-class Ajency.CurrentUser extends Backbone.Model
+class CurrentUser extends Backbone.Model
 
 	defaults : ->
 		return {}
@@ -45,5 +45,5 @@ class Ajency.CurrentUser extends Backbone.Model
 			$.post "#{APIURL}/authenticate", args[0], responseFn, 'json'
 
 # define the logged in user singleton
-window.currentUser = new Ajency.CurrentUser
+currentUser = new CurrentUser
 

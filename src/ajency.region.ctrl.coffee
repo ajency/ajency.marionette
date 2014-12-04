@@ -23,7 +23,7 @@ class Ajency.RegionController extends Marionette.RegionController
 		@_region = options.region
 
 		capName = "access_#{options.stateName}"
-		if window.currentUser.hasCap capName
+		if currentUser.hasCap capName
 			super options
 		else
 			@_showNoAccessView capName
@@ -34,9 +34,9 @@ class Ajency.RegionController extends Marionette.RegionController
 		@show new Ajency.NoAccessView type : _type
 
 	_getNoAccessType : (capName)->
-		if not window.currentUser.capExists capName
+		if not currentUser.capExists capName
 			_type = 'not_defined'
-		else if window.currentUser.capExists(capName) and not window.currentUser.isLoggedIn()
+		else if currentUser.capExists(capName) and not currentUser.isLoggedIn()
 			_type = 'no_access_login'
 		else
 			_type = 'no_access'
