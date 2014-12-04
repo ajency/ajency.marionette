@@ -1,3 +1,15 @@
+
+/*
+ *
+ * Ajency.Marionette
+ * https://github.com/ajency/ajency.marionette/wiki
+ * --------------------------------------------------
+ * Version: v0.1.0
+ *
+ * Copyright(c) 2014 Team Ajency, Ajency.in
+ * Distributed under MIT license
+ *
+ */
 var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
@@ -212,7 +224,7 @@ var __hasProp = {}.hasOwnProperty,
       this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
       capName = "access_" + options.stateName;
-      if (App.currentUser.hasCap(capName)) {
+      if (window.currentUser.hasCap(capName)) {
         RegionController.__super__.constructor.call(this, options);
       } else {
         this._showNoAccessView(capName);
@@ -229,9 +241,9 @@ var __hasProp = {}.hasOwnProperty,
 
     RegionController.prototype._getNoAccessType = function(capName) {
       var _type;
-      if (!App.currentUser.capExists(capName)) {
+      if (!window.currentUser.capExists(capName)) {
         _type = 'not_defined';
-      } else if (App.currentUser.capExists(capName) && !App.currentUser.isLoggedIn()) {
+      } else if (window.currentUser.capExists(capName) && !window.currentUser.isLoggedIn()) {
         _type = 'no_access_login';
       } else {
         _type = 'no_access';
