@@ -35,7 +35,7 @@ class CurrentUser extends Backbone.Model
 		_this = @
 		if _.isObject args[0]
 			responseFn = (response)->
-				if not _.isUndefined(response.error) and response.error is true
+				if _.isUndefined(response.ID)
 					_currentUser.trigger 'user:auth:failed', response
 					_this.triggerMethod 'user:auth:failed', response
 				else

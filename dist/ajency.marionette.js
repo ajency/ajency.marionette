@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.1.3
+ * Version: v0.1.4
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -112,7 +112,7 @@ var __hasProp = {}.hasOwnProperty,
       _this = this;
       if (_.isObject(args[0])) {
         responseFn = function(response) {
-          if (!_.isUndefined(response.error) && response.error === true) {
+          if (_.isUndefined(response.ID)) {
             _currentUser.trigger('user:auth:failed', response);
             return _this.triggerMethod('user:auth:failed', response);
           } else {
@@ -135,6 +135,9 @@ var __hasProp = {}.hasOwnProperty,
       }
     },
     navigate: Backbone.Router.prototype.navigate,
+    getCurrentRoute: function() {
+      return Backbone.history.getFragment();
+    },
     state: function(name, def) {
       if (def == null) {
         def = {};
@@ -233,6 +236,7 @@ var __hasProp = {}.hasOwnProperty,
       this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
       capName = "access_" + options.stateName;
+      capName = capName.toLowerCase();
       if (currentUser.hasCap(capName)) {
         RegionController.__super__.constructor.call(this, options);
       } else {

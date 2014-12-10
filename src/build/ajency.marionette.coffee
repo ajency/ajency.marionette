@@ -3,7 +3,7 @@
 # Ajency.Marionette
 # https://github.com/ajency/ajency.marionette/wiki
 # --------------------------------------------------
-# Version: v0.1.3
+# Version: v0.1.4
 #
 # Copyright(c) 2014 Team Ajency, Ajency.in
 # Distributed under MIT license
