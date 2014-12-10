@@ -9,7 +9,7 @@ window.userData =
     "user_status": "0"
     "display_name": "admin displayname"
     "caps":
-         "switch_themes": true
+        "switch_themes": true
         "edit_themes": true
         "activate_plugins": true
         "edit_plugins": true
@@ -72,6 +72,7 @@ window.userData =
         "delete_themes": true
         "export": true
         "administrator": true
+        "access_universitiessingle" : true
 
 
 # coffescript code here
@@ -174,7 +175,7 @@ class App.SocitiesTab3Ctrl extends Ajency.RegionController
 	initialize : ->
 		@show new Marionette.ItemView template : '<div>Awesome SocitiesTab3Ctrl</div>'
 
-class App.UniversitiesSingleCtrl extends Marionette.RegionController
+class App.UniversitiesSingleCtrl extends Ajency.RegionController
 	initialize : ->
 		@show new Marionette.ItemView template : '<div>Awesome UniversitiesSingleCtrl <a href="#/universities">Go</a></div>'
 

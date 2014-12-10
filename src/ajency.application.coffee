@@ -5,6 +5,9 @@ _.extend Marionette.Application::,
 
 	navigate : Backbone.Router::navigate
 
+	getCurrentRoute : ->
+		Backbone.history.getFragment()
+
 	state : (name, def = {})->
 		@appStates[name] = def
 		@

@@ -23,6 +23,8 @@ class Ajency.RegionController extends Marionette.RegionController
 		@_region = options.region
 
 		capName = "access_#{options.stateName}"
+		# convert the cap name to lower case
+		capName = capName.toLowerCase()
 		if currentUser.hasCap capName
 			super options
 		else
