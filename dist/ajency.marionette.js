@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.2.0
+ * Version: v0.2.2
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -84,6 +84,12 @@ var __hasProp = {}.hasOwnProperty,
       return authNS.localStorage.isSet('HTTP_X_API_KEY');
     };
 
+    CurrentUser.prototype.logout = function() {
+      authNS.localStorage.removeAll();
+      currentUserNS.localStorage.removeAll();
+      return this.trigger('user:logged:out');
+    };
+
     CurrentUser.prototype.hasCap = function(capName) {
       var caps;
       if (capName == null) {
@@ -120,7 +126,7 @@ var __hasProp = {}.hasOwnProperty,
       }
       _this = this;
       if (_.isObject(args[0])) {
-        responseFn = function(response) {
+        responseFn = function(response, status, xhr) {
           if (_.isUndefined(response.ID)) {
             _currentUser.trigger('user:auth:failed', response);
             return _this.trigger('user:auth:failed', response);

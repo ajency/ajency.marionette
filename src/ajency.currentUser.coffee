@@ -18,6 +18,11 @@ class CurrentUser extends Backbone.Model
 	isLoggedIn : ->
 		authNS.localStorage.isSet 'HTTP_X_API_KEY'
 
+	logout : ->
+		authNS.localStorage.removeAll()
+		currentUserNS.localStorage.removeAll()
+		@trigger 'user:logged:out'
+
 	hasCap : (capName = '')->
 		if not @has('caps') then return false
 		caps = @get 'caps'
@@ -38,7 +43,7 @@ class CurrentUser extends Backbone.Model
 		if @isLoggedIn() then return
 		_this = @
 		if _.isObject args[0]
-			responseFn = (response)->
+			responseFn = (response,  status, xhr)->
 				if _.isUndefined(response.ID)
 					_currentUser.trigger 'user:auth:failed', response
 					_this.trigger 'user:auth:failed', response
