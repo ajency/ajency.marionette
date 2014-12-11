@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.1.4
+ * Version: v0.2.0
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -15,27 +15,30 @@ var __hasProp = {}.hasOwnProperty,
   __slice = [].slice;
 
 (function(root, factory) {
-  var Backbone, Handlebars, Marionette, _;
+  var $, Backbone, Handlebars, Marionette, _;
   Backbone = void 0;
   Marionette = void 0;
   _ = void 0;
   if (typeof define === "function" && define.amd) {
-    return define(["backbone", "underscore", "backbone.marionette", "handlebars"], function(Backbone, _, Marionette, Handlebars) {
-      return root.Ajency = factory(root, Backbone, _, Marionette, Handlebars);
+    return define(["jquery", "backbone", "underscore", "backbone.marionette", "handlebars"], function($, Backbone, _, Marionette, Handlebars) {
+      return root.Ajency = factory(root, $, Backbone, _, Marionette, Handlebars);
     });
   } else if (typeof exports !== "undefined") {
+    $ = require("jquery");
     Backbone = require("backbone");
     _ = require("underscore");
     Marionette = require("backbone.marionette");
     Handlebars = require("handlebars");
-    return module.Ajency = factory(root, Backbone, _, Marionette, Handlebars);
+    return module.Ajency = factory(root, $, Backbone, _, Marionette, Handlebars);
   } else {
-    return root.Ajency = factory(root, root.Backbone, root._, root.Marionette, root.Handlebars);
+    return root.Ajency = factory(root, root.$, root.Backbone, root._, root.Marionette, root.Handlebars);
   }
-})(this, function(root, Backbone, _, Marionette, Handlebars) {
+})(this, function(root, $, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency, CurrentUser, NothingFoundView, currentUser;
+  var Ajency, CurrentUser, NothingFoundView, authNS, currentUser, currentUserNS;
   Ajency = {};
+  authNS = $.initNamespaceStorage('auth');
+  currentUserNS = $.initNamespaceStorage('currentUser');
   _.extend(Marionette.TemplateCache, {
     get: function(template) {
       var cachedTemplate, templateId;
@@ -71,8 +74,14 @@ var __hasProp = {}.hasOwnProperty,
       return {};
     };
 
+    CurrentUser.prototype.initialize = function(opt) {
+      if (currentUserNS.localStorage.isSet('userModel')) {
+        return this.set(currentUserNS.localStorage.get('userModel'));
+      }
+    };
+
     CurrentUser.prototype.isLoggedIn = function() {
-      return this.has('ID') && this.get('ID') > 0;
+      return authNS.localStorage.isSet('HTTP_X_API_KEY');
     };
 
     CurrentUser.prototype.hasCap = function(capName) {
@@ -114,8 +123,11 @@ var __hasProp = {}.hasOwnProperty,
         responseFn = function(response) {
           if (_.isUndefined(response.ID)) {
             _currentUser.trigger('user:auth:failed', response);
-            return _this.triggerMethod('user:auth:failed', response);
+            return _this.trigger('user:auth:failed', response);
           } else {
+            authNS.localStorage.set('HTTP_X_API_KEY', xhr.getResponseHeader('HTTP_X_API_KEY'));
+            authNS.localStorage.set('HTTP_X_SHARED_SECRET', xhr.getResponseHeader('HTTP_X_SHARED_SECRET'));
+            currentUserNS.localStorage.set('userModel', response);
             _currentUser.set(response);
             return _currentUser.trigger('user:auth:success', _currentUser);
           }
@@ -128,6 +140,28 @@ var __hasProp = {}.hasOwnProperty,
 
   })(Backbone.Model);
   currentUser = new CurrentUser;
+  jQuery.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      var HTTP_X_API_KEY, HTTP_X_SHARED_SECRET, apiSignature, args, timeStamp;
+      if (!authNS.localStorage.isSet('HTTP_X_API_KEY')) {
+        return;
+      }
+      apiSignature = '';
+      timeStamp = _.now();
+      HTTP_X_API_KEY = authNS.localStorage.get('HTTP_X_API_KEY');
+      HTTP_X_SHARED_SECRET = authNS.localStorage.get('HTTP_X_SHARED_SECRET');
+      args = {
+        'api_key': HTTP_X_API_KEY,
+        'timestamp': timeStamp + '',
+        'request_method': settings.type,
+        'request_uri': settings.url.replace(window.location.origin, '')
+      };
+      apiSignature = CryptoJS.MD5(JSON.stringify(args) + HTTP_X_SHARED_SECRET);
+      xhr.setRequestHeader('HTTP_X_API_KEY', HTTP_X_API_KEY);
+      xhr.setRequestHeader('HTTP_X_API_TIMESTAMP', timeStamp);
+      return xhr.setRequestHeader('HTTP_X_API_SIGNATURE', apiSignature);
+    }
+  });
   _.extend(Marionette.Application.prototype, {
     appStates: {
       'NothingFound': {
