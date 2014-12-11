@@ -75,9 +75,7 @@ window.userData =
         "access_universitiessingle" : true
 
 
-# coffescript code here
-Marionette.RegionControllers::controllers = App
-
+App.NothingFoundCtrl = Ajency.NothingFoundCtrl
 class App.RootCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.LayoutView template : '#root-template'
@@ -177,48 +175,51 @@ class App.SocitiesTab3Ctrl extends Ajency.RegionController
 
 class App.UniversitiesSingleCtrl extends Ajency.RegionController
 	initialize : ->
-		@show new Marionette.ItemView template : '<div>Awesome UniversitiesSingleCtrl <a href="#/universities">Go</a></div>'
+		@show new Marionette.ItemView template : '#universities-single-template'
 
 jQuery(document).ready ($)->
 
-	class AppStates extends Marionette.AppStates
+	App.state 'login'
 
-		appStates :
-			'login' : true
-			'root' :
+		.state 'root',
 				url : '/'
 				sections :
 					'header' :
 						ctrl : 'HeaderCtrl'
 					'leftnav' :
 						ctrl : 'LeftNavCtrl'
-			'universitieslist' :
+		.state 'universitieslist',
 				parent : 'root'
 				url : '/universities'
-			'universitiesSingle' :
+
+		.state 'universitiesSingle',
 				parent : 'root'
 				url : '/universities/:id'
-			'socitiesList' :
+
+		.state 'socitiesList',
 				parent : 'root'
 				url : '/socities'
-			'socitiesSingle' :
+
+		.state 'socitiesSingle',
 				parent : 'root'
 				url : '/socities/:id'
-			'socitiesTab1' :
+
+		.state 'socitiesTab1',
 				parent : 'socitiesSingle'
 				url : '/tab1'
-			'socitiesTab2' :
+
+		.state 'socitiesTab2',
 				parent : 'socitiesSingle'
 				url : '/tab2'
-			'socitiesTab3' :
+
+		.state 'socitiesTab3',
 				parent : 'socitiesSingle'
 				url : '/tab3'
 
 	App.addInitializer ->
 		App.currentUser.set userData
-		new AppStates app : App
 		Backbone.history.start()
-		App.navigate '/socities/23/tab3', true
+		App.navigate '/universities/23', true
 
 	App.start()
 

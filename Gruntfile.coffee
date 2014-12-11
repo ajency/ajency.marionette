@@ -36,6 +36,7 @@ module.exports = (grunt) ->
 					'bower_components/underscore/underscore.js'
 					'bower_components/jquery/dist/jquery.js'
 					'bower_components/backbone/backbone.js'
+					'bower_components/jQuery-Storage-API/jquery.storageapi.js'
 					'bower_components/backbone.marionette/lib/backbone.marionette.js'
 					'bower_components/marionette.state/dist/marionette.state.js'
 					'bower_components/handlebars/handlebars.js'

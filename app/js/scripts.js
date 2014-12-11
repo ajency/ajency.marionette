@@ -80,7 +80,7 @@ window.userData = {
   }
 };
 
-Marionette.RegionControllers.prototype.controllers = App;
+App.NothingFoundCtrl = Ajency.NothingFoundCtrl;
 
 App.RootCtrl = (function(_super) {
   __extends(RootCtrl, _super);
@@ -324,7 +324,7 @@ App.UniversitiesSingleCtrl = (function(_super) {
 
   UniversitiesSingleCtrl.prototype.initialize = function() {
     return this.show(new Marionette.ItemView({
-      template: '<div>Awesome UniversitiesSingleCtrl <a href="#/universities">Go</a></div>'
+      template: '#universities-single-template'
     }));
   };
 
@@ -333,67 +333,42 @@ App.UniversitiesSingleCtrl = (function(_super) {
 })(Ajency.RegionController);
 
 jQuery(document).ready(function($) {
-  var AppStates;
-  AppStates = (function(_super) {
-    __extends(AppStates, _super);
-
-    function AppStates() {
-      return AppStates.__super__.constructor.apply(this, arguments);
-    }
-
-    AppStates.prototype.appStates = {
-      'login': true,
-      'root': {
-        url: '/',
-        sections: {
-          'header': {
-            ctrl: 'HeaderCtrl'
-          },
-          'leftnav': {
-            ctrl: 'LeftNavCtrl'
-          }
-        }
+  App.state('login').state('root', {
+    url: '/',
+    sections: {
+      'header': {
+        ctrl: 'HeaderCtrl'
       },
-      'universitieslist': {
-        parent: 'root',
-        url: '/universities'
-      },
-      'universitiesSingle': {
-        parent: 'root',
-        url: '/universities/:id'
-      },
-      'socitiesList': {
-        parent: 'root',
-        url: '/socities'
-      },
-      'socitiesSingle': {
-        parent: 'root',
-        url: '/socities/:id'
-      },
-      'socitiesTab1': {
-        parent: 'socitiesSingle',
-        url: '/tab1'
-      },
-      'socitiesTab2': {
-        parent: 'socitiesSingle',
-        url: '/tab2'
-      },
-      'socitiesTab3': {
-        parent: 'socitiesSingle',
-        url: '/tab3'
+      'leftnav': {
+        ctrl: 'LeftNavCtrl'
       }
-    };
-
-    return AppStates;
-
-  })(Marionette.AppStates);
+    }
+  }).state('universitieslist', {
+    parent: 'root',
+    url: '/universities'
+  }).state('universitiesSingle', {
+    parent: 'root',
+    url: '/universities/:id'
+  }).state('socitiesList', {
+    parent: 'root',
+    url: '/socities'
+  }).state('socitiesSingle', {
+    parent: 'root',
+    url: '/socities/:id'
+  }).state('socitiesTab1', {
+    parent: 'socitiesSingle',
+    url: '/tab1'
+  }).state('socitiesTab2', {
+    parent: 'socitiesSingle',
+    url: '/tab2'
+  }).state('socitiesTab3', {
+    parent: 'socitiesSingle',
+    url: '/tab3'
+  });
   App.addInitializer(function() {
     App.currentUser.set(userData);
-    new AppStates({
-      app: App
-    });
     Backbone.history.start();
-    return App.navigate('/socities/23/tab3', true);
+    return App.navigate('/universities/23', true);
   });
   return App.start();
 });
