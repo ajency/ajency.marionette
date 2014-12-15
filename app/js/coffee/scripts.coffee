@@ -103,8 +103,8 @@ class HeaderView extends Marionette.ItemView
 			<div id="bs-example-navbar-collapse-8" class="collapse navbar-collapse">
 			  <ul class="nav navbar-nav">
 				<li class="active"><a href="#">Home</a></li>
-				<li><a href="#">Link</a></li>
-				<li><a href="#">Link</a></li>
+				<li role="presentation"><a href="#/login">Login</a></li>
+				<li role="presentation"><a href="#/login">Login</a></li>
 			  </ul>
 			</div><!-- /.navbar-collapse -->
 		  </div>

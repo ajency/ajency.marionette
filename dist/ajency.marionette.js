@@ -4,13 +4,14 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.2.2
+ * Version: v0.2.3
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
  *
  */
-var __hasProp = {}.hasOwnProperty,
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
@@ -35,7 +36,7 @@ var __hasProp = {}.hasOwnProperty,
   }
 })(this, function(root, $, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency, CurrentUser, NothingFoundView, authNS, currentUser, currentUserNS;
+  var Ajency, NothingFoundView, authNS, currentUser, currentUserNS;
   Ajency = {};
   authNS = $.initNamespaceStorage('auth');
   currentUserNS = $.initNamespaceStorage('currentUser');
@@ -63,10 +64,16 @@ var __hasProp = {}.hasOwnProperty,
       return Handlebars.compile(rawTemplate);
     }
   });
-  CurrentUser = (function(_super) {
+  _.mixin({
+    isFbDefined: function() {
+      return typeof FB === 'object';
+    }
+  });
+  Ajency.CurrentUser = (function(_super) {
     __extends(CurrentUser, _super);
 
     function CurrentUser() {
+      this._setProfilePicture = __bind(this._setProfilePicture, this);
       return CurrentUser.__super__.constructor.apply(this, arguments);
     }
 
@@ -117,35 +124,74 @@ var __hasProp = {}.hasOwnProperty,
       return false;
     };
 
-    CurrentUser.prototype.authenticate = function() {
-      var args, responseFn, _currentUser, _this;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      _currentUser = this;
-      if (this.isLoggedIn()) {
+    CurrentUser.prototype.getFacebookPicture = function() {
+      var options;
+      if (!_.isFbDefined()) {
         return;
       }
-      _this = this;
-      if (_.isObject(args[0])) {
-        responseFn = function(response, status, xhr) {
-          if (_.isUndefined(response.ID)) {
-            _currentUser.trigger('user:auth:failed', response);
-            return _this.trigger('user:auth:failed', response);
-          } else {
-            authNS.localStorage.set('HTTP_X_API_KEY', xhr.getResponseHeader('HTTP_X_API_KEY'));
-            authNS.localStorage.set('HTTP_X_SHARED_SECRET', xhr.getResponseHeader('HTTP_X_SHARED_SECRET'));
-            currentUserNS.localStorage.set('userModel', response);
-            _currentUser.set(response);
-            return _currentUser.trigger('user:auth:success', _currentUser);
+      options = {
+        "redirect": false,
+        "height": "200",
+        "type": "normal",
+        "width": "200"
+      };
+      return FB.api("/me/picture", options, this._setProfilePicture);
+    };
+
+    CurrentUser.prototype._setProfilePicture = function(resp) {
+      var _picture;
+      if (resp && !resp.error) {
+        _picture = {
+          'id': 0,
+          'sizes': {
+            "thumbnail": {
+              "height": 150,
+              "width": 150,
+              "url": resp.data.url
+            }
           }
         };
-        return $.post("" + APIURL + "/authenticate", args[0], responseFn, 'json');
+        return this.set('profile_picture', _picture);
+      }
+    };
+
+    CurrentUser.prototype.authenticate = function() {
+      var accessToken, args, data, responseFn, userData, userLogin, _currentUser, _this;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      _currentUser = this;
+      _this = this;
+      responseFn = function(response, status, xhr) {
+        if (_.isUndefined(response.ID)) {
+          _currentUser.trigger("user:auth:failed", response);
+          return _this.trigger("user:auth:failed", response);
+        } else {
+          authNS.localStorage.set("HTTP_X_API_KEY", xhr.getResponseHeader("HTTP_X_API_KEY"));
+          authNS.localStorage.set("HTTP_X_SHARED_SECRET", xhr.getResponseHeader("HTTP_X_SHARED_SECRET"));
+          currentUserNS.localStorage.set("userModel", response);
+          _currentUser.set(response);
+          return _currentUser.trigger("user:auth:success", _currentUser);
+        }
+      };
+      if (_.isString(args[0])) {
+        userData = args[1];
+        accessToken = args[2];
+        userLogin = "FB_" + userData.id;
+        data = {
+          user_login: userLogin,
+          user_pass: accessToken,
+          type: "facebook",
+          userData: userData
+        };
+        return $.post("" + APIURL + "/authenticate", data, responseFn, "json");
+      } else if (_.isObject(args[0])) {
+        return $.post("" + APIURL + "/authenticate", args[0], responseFn, "json");
       }
     };
 
     return CurrentUser;
 
   })(Backbone.Model);
-  currentUser = new CurrentUser;
+  currentUser = new Ajency.CurrentUser;
   jQuery.ajaxSetup({
     beforeSend: function(xhr, settings) {
       var HTTP_X_API_KEY, HTTP_X_SHARED_SECRET, apiSignature, args, timeStamp;
@@ -311,20 +357,23 @@ var __hasProp = {}.hasOwnProperty,
     __extends(LoginView, _super);
 
     function LoginView() {
+      this._fbLoginHandler = __bind(this._fbLoginHandler, this);
+      this.loginWithFacebook = __bind(this.loginWithFacebook, this);
       return LoginView.__super__.constructor.apply(this, arguments);
     }
 
     LoginView.prototype.template = '#login-template';
 
     LoginView.prototype.ui = {
-      'loginBtn': '#btn-login',
-      'fbLoginBtn': '#btn-fblogin',
+      'loginBtn': '.aj-login-button',
+      'fbLoginButton': '.aj-fb-login-button',
       'userLogin': 'input[name="user_login"]',
       'userPass': 'input[name="user_pass"]'
     };
 
     LoginView.prototype.events = {
-      'click @ui.loginBtn': 'loginDefault'
+      'click @ui.loginBtn': 'loginDefault',
+      'click @ui.fbLoginButton': 'loginWithFacebook'
     };
 
     LoginView.prototype.initialize = function(options) {
@@ -334,6 +383,30 @@ var __hasProp = {}.hasOwnProperty,
       return this.listenTo(currentUser, 'user:auth:failed', function(response) {
         return this.triggerMethod('user:auth:failed', response);
       });
+    };
+
+    LoginView.prototype.loginWithFacebook = function(evt) {
+      var _scope;
+      if (!_.isFbDefined()) {
+        throw new Marionette.Error('Please add facebook SDK');
+      }
+      _scope = this.ui.fbLoginButton.attr('fb-scope');
+      _scope = !_.isString(_scope) ? '' : _scope;
+      return FB.login(this._fbLoginHandler, {
+        scope: _scope
+      });
+    };
+
+    LoginView.prototype._fbLoginHandler = function(response) {
+      if (response.authResponse) {
+        return FB.api('/me', (function(_this) {
+          return function(user) {
+            return _this.triggerMethod('facebook:login:success', user, response.authResponse.accessToken);
+          };
+        })(this));
+      } else {
+        return this.triggerMethod('facebook:login:cancel');
+      }
     };
 
     LoginView.prototype.loginDefault = function() {
@@ -356,8 +429,21 @@ var __hasProp = {}.hasOwnProperty,
     }
 
     LoginCtrl.prototype.initialize = function() {
-      this._view = new Ajency.LoginView;
-      return this.show(this._view);
+      var loginView;
+      loginView = new Ajency.LoginView;
+      this.listenTo(loginView, 'facebook:login:success', this._facebookAuthSuccess);
+      this.listenTo(loginView, 'facebook:login:cancel', this._facebookAuthCancel);
+      return this.show(loginView);
+    };
+
+    LoginCtrl.prototype._facebookAuthSuccess = function() {
+      var args;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return currentUser.authenticate.apply(currentUser, ['facebook'].concat(__slice.call(args)));
+    };
+
+    LoginCtrl.prototype._facebookAuthCancel = function() {
+      return currentUser.trigger('user:auth:cancel');
     };
 
     return LoginCtrl;
