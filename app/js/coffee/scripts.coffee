@@ -76,6 +76,7 @@ window.userData =
 
 
 App.NothingFoundCtrl = Ajency.NothingFoundCtrl
+App.FileUploadCtrl = Ajency.FileUploadCtrl
 class App.RootCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.LayoutView template : '#root-template'
@@ -85,7 +86,7 @@ class App.LoginCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.ItemView template : '#login-template'
 
-class HeaderView extends Marionette.ItemView
+class HeaderView extends Marionette.LayoutView
 	template : '<div><nav role="navigation" class="navbar navbar-default navbar-static-top">
 		  <div class="container-fluid">
 			<div class="navbar-header">
@@ -98,7 +99,7 @@ class HeaderView extends Marionette.ItemView
 			  <a href="#" class="navbar-brand">Brand</a>
 			</div>
 			<div class="pull-right">
-				<div></div>
+				<div ui-region="currentUser"></div>
 			</div>
 			<div id="bs-example-navbar-collapse-8" class="collapse navbar-collapse">
 			  <ul class="nav navbar-nav">
@@ -109,6 +110,8 @@ class HeaderView extends Marionette.ItemView
 			</div><!-- /.navbar-collapse -->
 		  </div>
 		</nav></div>'
+	onShow : ->
+		@currentUserRegion.show new Ajency.CurrentUserView model : App.currentUser
 
 class App.HeaderCtrl extends Marionette.RegionController
 	initialize : ->
@@ -215,6 +218,7 @@ jQuery(document).ready ($)->
 		.state 'socitiesTab3',
 				parent : 'socitiesSingle'
 				url : '/tab3'
+				ctrl  :'FileUploadCtrl'
 
 	App.addInitializer ->
 		App.currentUser.set userData

@@ -82,6 +82,8 @@ window.userData = {
 
 App.NothingFoundCtrl = Ajency.NothingFoundCtrl;
 
+App.FileUploadCtrl = Ajency.FileUploadCtrl;
+
 App.RootCtrl = (function(_super) {
   __extends(RootCtrl, _super);
 
@@ -123,11 +125,17 @@ HeaderView = (function(_super) {
     return HeaderView.__super__.constructor.apply(this, arguments);
   }
 
-  HeaderView.prototype.template = '<div><nav role="navigation" class="navbar navbar-default navbar-static-top"> <div class="container-fluid"> <div class="navbar-header"> <button data-target="#bs-example-navbar-collapse-8" data-toggle="collapse" class="navbar-toggle collapsed" type="button"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button> <a href="#" class="navbar-brand">Brand</a> </div> <div class="pull-right"> <div></div> </div> <div id="bs-example-navbar-collapse-8" class="collapse navbar-collapse"> <ul class="nav navbar-nav"> <li class="active"><a href="#">Home</a></li> <li role="presentation"><a href="#/login">Login</a></li> <li role="presentation"><a href="#/login">Login</a></li> </ul> </div><!-- /.navbar-collapse --> </div> </nav></div>';
+  HeaderView.prototype.template = '<div><nav role="navigation" class="navbar navbar-default navbar-static-top"> <div class="container-fluid"> <div class="navbar-header"> <button data-target="#bs-example-navbar-collapse-8" data-toggle="collapse" class="navbar-toggle collapsed" type="button"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button> <a href="#" class="navbar-brand">Brand</a> </div> <div class="pull-right"> <div ui-region="currentUser"></div> </div> <div id="bs-example-navbar-collapse-8" class="collapse navbar-collapse"> <ul class="nav navbar-nav"> <li class="active"><a href="#">Home</a></li> <li role="presentation"><a href="#/login">Login</a></li> <li role="presentation"><a href="#/login">Login</a></li> </ul> </div><!-- /.navbar-collapse --> </div> </nav></div>';
+
+  HeaderView.prototype.onShow = function() {
+    return this.currentUserRegion.show(new Ajency.CurrentUserView({
+      model: App.currentUser
+    }));
+  };
 
   return HeaderView;
 
-})(Marionette.ItemView);
+})(Marionette.LayoutView);
 
 App.HeaderCtrl = (function(_super) {
   __extends(HeaderCtrl, _super);
@@ -363,7 +371,8 @@ jQuery(document).ready(function($) {
     url: '/tab2'
   }).state('socitiesTab3', {
     parent: 'socitiesSingle',
-    url: '/tab3'
+    url: '/tab3',
+    ctrl: 'FileUploadCtrl'
   });
   App.addInitializer(function() {
     App.currentUser.set(userData);

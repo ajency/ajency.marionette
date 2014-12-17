@@ -9,6 +9,7 @@
     "lesshat": "~3.0.2",
     "marionette.state": "git@github.com:ajency/marionette.state.git#~0.1.0",
     "handlebars": "~2.0.0",
-    "jQuery-Storage-API": "~1.7.3"
+    "jQuery-Storage-API": "~1.7.3",
+    "plupload": "~2.1.2"
   }
 }

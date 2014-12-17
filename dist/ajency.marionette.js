@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.2.3
+ * Version: v0.2.4
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -36,7 +36,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   }
 })(this, function(root, $, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency, NothingFoundView, authNS, currentUser, currentUserNS;
+  var Ajency, NothingFoundView, authNS, currentUser, currentUserNS, currentUserTemplate, uploadTemplate;
   Ajency = {};
   authNS = $.initNamespaceStorage('auth');
   currentUserNS = $.initNamespaceStorage('currentUser');
@@ -475,5 +475,170 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     return NothingFoundCtrl;
 
   })(Marionette.RegionController);
+  uploadTemplate = '<img src="{{sizes.thumbnail.url}}" width="100" height="100" class="img-responsive img-rounded" /> <input type="hidden" name="media_id" value="{{id}}"/> <input type="hidden" name="media_sizes" value="{{sizesToString}}"/> <div id="filelist">Your browser doesnt have Flash, Silverlight or HTML5 support.</div> <br /> <div id="container"> <a id="pickfiles" href="javascript:;">[Select file]</a> <a id="uploadfiles" href="javascript:;">[Upload file]</a> </div> <br />';
+  Ajency.UploadView = (function(_super) {
+    __extends(UploadView, _super);
+
+    function UploadView() {
+      return UploadView.__super__.constructor.apply(this, arguments);
+    }
+
+    UploadView.prototype.template = Handlebars.compile(uploadTemplate);
+
+    UploadView.prototype.initialize = function(opt) {
+      return this.model = opt.model, opt;
+    };
+
+    UploadView.prototype.mixinTemplateHelpers = function(data) {
+      data = UploadView.__super__.mixinTemplateHelpers.call(this, data);
+      data.sizesToString = JSON.stringify(data.sizes);
+      return data;
+    };
+
+    UploadView.prototype._pluploadHeaders = function() {
+      var HTTP_X_API_KEY, HTTP_X_SHARED_SECRET, apiSignature, args, timeStamp;
+      if (!authNS.localStorage.isSet('HTTP_X_API_KEY')) {
+        return;
+      }
+      apiSignature = '';
+      timeStamp = _.now();
+      HTTP_X_API_KEY = authNS.localStorage.get('HTTP_X_API_KEY');
+      HTTP_X_SHARED_SECRET = authNS.localStorage.get('HTTP_X_SHARED_SECRET');
+      args = {
+        'api_key': HTTP_X_API_KEY,
+        'timestamp': timeStamp + '',
+        'request_method': 'POST',
+        'request_uri': ("" + APIURL + "/attachments").replace(window.location.origin, '')
+      };
+      apiSignature = CryptoJS.MD5(JSON.stringify(args) + HTTP_X_SHARED_SECRET);
+      return {
+        'HTTP_X_API_KEY': HTTP_X_API_KEY,
+        'HTTP_X_API_TIMESTAMP': timeStamp,
+        'HTTP_X_API_SIGNATURE': apiSignature
+      };
+    };
+
+    UploadView.prototype.onShow = function() {
+      this.uploaded = 0;
+      this.uploader = new plupload.Uploader({
+        runtimes: "gears,html5,flash,silverlight,browserplus",
+        file_data_name: "async-upload",
+        browse_button: "pickfiles",
+        multiple_queues: true,
+        multipart: true,
+        urlstream_upload: true,
+        max_file_size: "2mb",
+        url: "" + APIURL + "/attachments",
+        flash_swf_url: "" + _SITEURL + "/wp-includes/js/plupload/plupload.flash.swf",
+        silverlight_xap_url: "" + _SITEURL + "/wp-includes/js/plupload/plupload.silverlight.xap",
+        headers: this._pluploadHeaders(),
+        filters: [
+          {
+            title: "Image files",
+            extensions: "jpg,gif,png"
+          }
+        ],
+        multipart_params: {
+          action: "upload-attachment",
+          _wpnonce: _WP_MEDIA_NONCE
+        },
+        init: {
+          PostInit: function(up) {
+            document.getElementById("filelist").innerHTML = "";
+            return document.getElementById("uploadfiles").onclick = function() {
+              return up.start();
+            };
+          },
+          FilesAdded: function(up, files) {
+            return plupload.each(files, function(file) {
+              return document.getElementById("filelist").innerHTML += "<div id=\"" + file.id + "\">" + file.name + " (" + plupload.formatSize(file.size) + ") <b></b></div>";
+            });
+          },
+          UploadProgress: function(up, file) {
+            return document.getElementById(file.id).getElementsByTagName("b")[0].innerHTML = "<span>" + file.percent + "%</span>";
+          },
+          Error: function(up, err) {
+            return document.getElementById("console").innerHTML += "\nError #" + err.code + ": " + err.message;
+          },
+          FileUploaded: (function(_this) {
+            return function(up, file, response) {
+              response = JSON.parse(response.response);
+              _this.model.set(response);
+              _this.$el.find('img').attr('src', _this.model.get('sizes')['thumbnail']['url']);
+              _this.$el.find('input[name="media_id"]').val(_this.model.get('id'));
+              return _this.$el.find('input[name="media_sizes"]').val(JSON.stringify(_this.model.get('sizes')));
+            };
+          })(this)
+        }
+      });
+      return this.uploader.init();
+    };
+
+    UploadView.prototype.onClose = function() {
+      return this.uploader.destroy();
+    };
+
+    return UploadView;
+
+  })(Marionette.ItemView);
+  Ajency.FileUploadCtrl = (function(_super) {
+    __extends(FileUploadCtrl, _super);
+
+    function FileUploadCtrl() {
+      return FileUploadCtrl.__super__.constructor.apply(this, arguments);
+    }
+
+    FileUploadCtrl.prototype.initialize = function(opt) {
+      var model;
+      if (opt == null) {
+        opt = {};
+      }
+      model = opt.model;
+      return this.show(new Ajency.UploadView({
+        model: model
+      }));
+    };
+
+    return FileUploadCtrl;
+
+  })(Marionette.RegionController);
+  currentUserTemplate = '<div data-placement="bottom" data-toggle="popover" title="{{display_name}}" >&nbsp; {{display_name}} &nbsp;<img class="media-object dp img-rounded" src="{{profile_picture.sizes.thumbnail.url}}" style="width: 30px;height:30px;"></div> <div class="hidden popover-content"> <div class="text-center"> <img class="media-object dp img-rounded" src="{{profile_picture.sizes.thumbnail.url}}" style="width: 100px;height:100px;"> <button class="btn btn-small logout-button" >Logout</button> </div> </div>';
+  Ajency.CurrentUserView = (function(_super) {
+    __extends(CurrentUserView, _super);
+
+    function CurrentUserView() {
+      return CurrentUserView.__super__.constructor.apply(this, arguments);
+    }
+
+    CurrentUserView.prototype.template = Handlebars.compile(currentUserTemplate);
+
+    CurrentUserView.prototype.modelEvents = {
+      'change': 'render'
+    };
+
+    CurrentUserView.prototype.ui = {
+      'logoutButton': '.logout-button'
+    };
+
+    CurrentUserView.prototype.events = {
+      'click @ui.logoutButton': 'logoutApp'
+    };
+
+    CurrentUserView.prototype.logoutApp = function() {
+      return currentUser.logout();
+    };
+
+    CurrentUserView.prototype.onRender = function() {
+      var _content;
+      _content = this.$el.find('.popover-content').html();
+      return this.$el.find('[data-toggle="popover"]').popover({
+        html: true,
+        content: _content
+      });
+    };
+
+    return CurrentUserView;
+
+  })(Marionette.ItemView);
   return Ajency;
 });
