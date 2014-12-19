@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.2.5
+ * Version: v0.3.0
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -421,6 +421,93 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     return ActiveLinkBehavior;
+
+  })(Marionette.Behavior);
+  Ajency.FormBehavior = (function(_super) {
+    __extends(FormBehavior, _super);
+
+    function FormBehavior() {
+      this._showRequestFailerMessage = __bind(this._showRequestFailerMessage, this);
+      this._showSuccessMessage = __bind(this._showSuccessMessage, this);
+      return FormBehavior.__super__.constructor.apply(this, arguments);
+    }
+
+    FormBehavior.prototype.ui = {
+      submitButton: '.aj-submit-button',
+      responseMessage: '.aj-response-message'
+    };
+
+    FormBehavior.prototype.defaults = function() {
+      return {
+        successMessage: 'Enter your success message in behavior options',
+        errorMessage: 'Enter your error message in behavior options'
+      };
+    };
+
+    FormBehavior.prototype.events = {
+      'click @ui.submitButton': '_validateForm'
+    };
+
+    FormBehavior.prototype.initialize = function() {
+      this.listenTo(this.view, 'render', this._initMasking);
+      this.listenTo(this.view, 'render', this._initValidation);
+      this.listenTo(this.view, 'destroy', this._cleanUpView);
+      this.view.showSuccessMessage = this._showSuccessMessage;
+      return this.view.showRequestFailerMessage = this._showRequestFailerMessage;
+    };
+
+    FormBehavior.prototype._initMasking = function() {
+      var inputFields;
+      inputFields = this.view.$('[aj-inputmask]');
+      return inputFields.each(function(index, field) {
+        return $(field).inputmask($(field).attr('aj-inputmask'));
+      });
+    };
+
+    FormBehavior.prototype._initValidation = function() {
+      if (this.view.$el.prop('tagName') === 'FORM') {
+        this.form = this.view.$el;
+      } else {
+        if (this.view.$('form').length === 0) {
+          throw new Marionette.Error('Form tag missing. Please add a form');
+        }
+        this.form = this.view.$('form');
+      }
+      this.form.attr('data-parsley-namespace', 'aj-field-');
+      return this.validator = this.view.validator = $(this.form).parsley();
+    };
+
+    FormBehavior.prototype._cleanUpView = function() {
+      delete this.view.validator;
+      delete this.view.showSuccessMessage;
+      return delete this.view.showRequestFailerMessage;
+    };
+
+    FormBehavior.prototype._validateForm = function(evt) {
+      var formData;
+      evt.preventDefault();
+      if (this.validator.validate()) {
+        this.ui.submitButton.addClass('aj-form-submit-in-process');
+        formData = Backbone.Syphon.serialize(this.view);
+        return this.view.triggerMethod('form:submit', formData);
+      }
+    };
+
+    FormBehavior.prototype._showSuccessMessage = function() {
+      this.ui.responseMessage.addClass('alert-success').html(this.options.successMessage);
+      return this._removeFormSubmitClass();
+    };
+
+    FormBehavior.prototype._showRequestFailerMessage = function() {
+      this.ui.responseMessage.addClass('alert-danger').html(this.options.errorMessage);
+      return this._removeFormSubmitClass();
+    };
+
+    FormBehavior.prototype._removeFormSubmitClass = function() {
+      return this.ui.submitButton.removeClass('aj-form-submit-in-process');
+    };
+
+    return FormBehavior;
 
   })(Marionette.Behavior);
   Ajency.NoAccessView = (function(_super) {

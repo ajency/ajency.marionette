@@ -3,7 +3,7 @@
 # Ajency.Marionette
 # https://github.com/ajency/ajency.marionette/wiki
 # --------------------------------------------------
-# Version: v0.2.5
+# Version: v0.3.0
 #
 # Copyright(c) 2014 Team Ajency, Ajency.in
 # Distributed under MIT license
@@ -50,6 +50,7 @@
 	# @include ../ajency.application.coffee
 
 	# @include ../ajency.activelink.behavior.coffee
+	# @include ../ajency.form.behavior.coffee
 
 	# @include ../ajency.region.ctrl.coffee
 	# @include ../ajency.login.ctrl.coffee

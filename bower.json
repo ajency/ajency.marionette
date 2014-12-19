@@ -1,6 +1,6 @@
 {
   "name": "ajency.marionette",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "homepage": "https://github.com/surajajency/ajency.marionette",
   "authors": [
     "Suraj Air <suraj@ajency.in>"
@@ -24,7 +24,10 @@
     "backbone.marionette": "~2.3.0",
     "handlebars": "~2.0.0",
     "marionette.state": "git@github.com:ajency/marionette.state.git#~0.1.0",
-    "jQuery-Storage-API": "~1.7.3"
+    "jQuery-Storage-API": "~1.7.3",
+    "jquery.inputmask": "~3.1.48",
+    "parsleyjs": "~2.0.6",
+    "backbone.syphon": "~0.4.1"
   },
   "devDependencies": {
     "jasmine-jquery": "~2.0.5",

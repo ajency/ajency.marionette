@@ -27,13 +27,15 @@
 	<script id="universities-single-template" type="x">
 		<div class="row">
 		    <div class="col-xs-10">
-		      <form role="form">
-		        <h2>Please Sign Up <small>Its free and always will be.</small></h2>
+		      <h2>Please Sign Up <small>Its free and always will be.</small></h2>
+		      <div class="aj-response-message alert">
+
+		      </div>
 		        <hr class="colorgraph">
 		        <div class="row">
 		          <div class="col-xs-6 col-sm-6 col-md-6">
 		            <div class="form-group">
-		              <input type="text" name="first_name" id="first_name" class="form-control input-lg" placeholder="First Name" tabindex="1">
+		              <input type="text" aj-field-required="true" aj-inputmask="(999) 999 999" name="phone_number" id="phone_number" class="form-control input-lg" placeholder="Phone" tabindex="1">
 		            </div>
 		          </div>
 		          <div class="col-xs-6 col-sm-6 col-md-6">
@@ -73,10 +75,9 @@
 		        </div>
 		        <hr class="colorgraph">
 		        <div class="row">
-		          <div class="col-xs-3 col-md-3"><a href="#" class="btn btn-success btn-block btn-lg">Submit </a></div>
+		          <div class="col-xs-3 col-md-3 btn btn-success btn-block btn-lg aj-submit-button">Submit</div>
 		        </div>
-		      </form>
-		    </div>
+		      </div>
 		  </div>
 
 	</script>

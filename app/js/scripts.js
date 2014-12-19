@@ -1,4 +1,4 @@
-var HeaderView, LeftNavView, SocialSingle,
+var HeaderView, LeftNavView, SocialSingle, UniversitiesSingleView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -325,6 +325,31 @@ App.SocitiesTab3Ctrl = (function(_super) {
 
 })(Ajency.RegionController);
 
+UniversitiesSingleView = (function(_super) {
+  __extends(UniversitiesSingleView, _super);
+
+  function UniversitiesSingleView() {
+    return UniversitiesSingleView.__super__.constructor.apply(this, arguments);
+  }
+
+  UniversitiesSingleView.prototype.template = '#universities-single-template';
+
+  UniversitiesSingleView.prototype.tagName = 'form';
+
+  UniversitiesSingleView.prototype.behaviors = {
+    FormBehavior: {
+      behaviorClass: Ajency.FormBehavior
+    }
+  };
+
+  UniversitiesSingleView.prototype.onFormSubmit = function(formData) {
+    return console.log(formData);
+  };
+
+  return UniversitiesSingleView;
+
+})(Marionette.ItemView);
+
 App.UniversitiesSingleCtrl = (function(_super) {
   __extends(UniversitiesSingleCtrl, _super);
 
@@ -333,9 +358,7 @@ App.UniversitiesSingleCtrl = (function(_super) {
   }
 
   UniversitiesSingleCtrl.prototype.initialize = function() {
-    return this.show(new Marionette.ItemView({
-      template: '#universities-single-template'
-    }));
+    return this.show(new UniversitiesSingleView);
   };
 
   return UniversitiesSingleCtrl;
@@ -379,7 +402,7 @@ jQuery(document).ready(function($) {
   App.addInitializer(function() {
     App.currentUser.set(userData);
     Backbone.history.start();
-    return App.navigate('/login', true);
+    return App.navigate('/universities/23', true);
   });
   return App.start();
 });
