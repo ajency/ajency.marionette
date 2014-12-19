@@ -44,6 +44,7 @@
 	authNS = $.initNamespaceStorage 'auth'
 	currentUserNS = $.initNamespaceStorage 'currentUser'
 
+	# @include ../cordova.facebook.coffee
 	# @include ../ajency.templateCache.coffee
 	# @include ../ajency.currentUser.coffee
 	# @include ../ajency.application.coffee

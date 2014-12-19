@@ -27,6 +27,7 @@
     <body>
         <!-- markup here -->
         <div ui-region classs="container-fluid"></div>
+        <div id="fb-root"></div>
         <script id="universities-single-template" type="x">
             <div class="row">
             		    <div class="col-xs-10">
@@ -97,6 +98,7 @@
                                         <img src="http://s11.postimg.org/7kzgji28v/logo_sm_2_mr_1.png" class="img-responsive" alt="Conxole Admin"/>
                                     </div>
                                 </div>
+                                <button type="button" class="btn aj-fb-login-button">Fb Login</button>
                                 <div class="panel-body">
                                     <form accept-charset="UTF-8" role="form" class="form-signin">
                                         <fieldset>
@@ -208,17 +210,15 @@
         <script "text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
         <script "text/javascript" src="bower_components/backbone/backbone.js"></script>
         <script "text/javascript" src="bower_components/jQuery-Storage-API/jquery.storageapi.js"></script>
-        <script "text/javascript" src="bower_components/plupload/js/moxie.js"></script>
-        <script "text/javascript" src="bower_components/plupload/js/plupload.min.js"></script>
         <script "text/javascript" src="bower_components/backbone.marionette/lib/backbone.marionette.js"></script>
         <script "text/javascript" src="bower_components/marionette.state/dist/marionette.state.js"></script>
         <script "text/javascript" src="bower_components/handlebars/handlebars.js"></script>
         <script "text/javascript" src="ajency.marionette.js"></script>
         <script "text/javascript">
             App = new Marionette.Application
-            APIURL = ''
-            _SITEURL = ''
-            _WP_MEDIA_NONCE = 'sdsds'
+            APIURL = 'http://localhost:8000/api/v1';
+            _SITEURL = 'http://localhost:8000';
+            facebookConnectPlugin.browserInit(App, '1536911019885325');
         </script>
         <script type="text/javascript" src="js/scripts.js"></script>
     </body>

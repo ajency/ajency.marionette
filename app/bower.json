@@ -7,6 +7,7 @@
     "html5shiv": "~3.7.2",
     "bootstrap": "~3.3.1",
     "lesshat": "~3.0.2",
+    "backbone.marionette": "~2.3.0",
     "marionette.state": "git@github.com:ajency/marionette.state.git#~0.1.0",
     "handlebars": "~2.0.0",
     "jQuery-Storage-API": "~1.7.3",

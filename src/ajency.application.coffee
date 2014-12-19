@@ -3,8 +3,6 @@ _.extend Marionette.Application::,
 	appStates :
 		'NothingFound' : url : '/*notFound'
 
-	navigate : Backbone.Router::navigate
-
 	getCurrentRoute : ->
 		Backbone.history.getFragment()
 

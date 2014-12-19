@@ -81,8 +81,8 @@ class App.RootCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.LayoutView template : '#root-template'
 
-
-class App.LoginCtrl extends Marionette.RegionController
+App.LoginCtrl = Ajency.LoginCtrl
+class App.LsoginCtrl extends Marionette.RegionController
 	initialize : ->
 		@show new Marionette.ItemView template : '#login-template'
 
@@ -223,7 +223,7 @@ jQuery(document).ready ($)->
 	App.addInitializer ->
 		App.currentUser.set userData
 		Backbone.history.start()
-		App.navigate '/universities/23', true
+		App.navigate '/login', true
 
 	App.start()
 
