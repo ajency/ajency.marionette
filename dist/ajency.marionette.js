@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.2.4
+ * Version: v0.2.5
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -40,6 +40,157 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   Ajency = {};
   authNS = $.initNamespaceStorage('auth');
   currentUserNS = $.initNamespaceStorage('currentUser');
+  if (!window.cordova) {
+    window.facebookConnectPlugin = {
+      getLoginStatus: function(s, f) {
+        var error;
+        try {
+          FB.getLoginStatus(function(response) {
+            s(response);
+          });
+        } catch (_error) {
+          error = _error;
+          if (!f) {
+            console.error(error.message);
+          } else {
+            f(error.message);
+          }
+        }
+      },
+      showDialog: function(options, s, f) {
+        var error;
+        if (!options.name) {
+          options.name = "";
+        }
+        if (!options.message) {
+          options.message = "";
+        }
+        if (!options.caption) {
+          options.caption = "";
+        }
+        if (!options.description) {
+          options.description = "";
+        }
+        if (!options.href) {
+          options.href = "";
+        }
+        if (!options.picture) {
+          options.picture = "";
+        }
+        try {
+          FB.ui(options, function(response) {
+            if (response && (response.request || !response.error_code)) {
+              s(response);
+            } else {
+              f(response);
+            }
+          });
+        } catch (_error) {
+          error = _error;
+          if (!f) {
+            console.error(error.message);
+          } else {
+            f(error.message);
+          }
+        }
+      },
+      login: function(permissions, s, f) {
+        var permissionObj;
+        permissionObj = {};
+        if (permissions && permissions.length > 0) {
+          permissionObj.scope = permissions.toString();
+        }
+        FB.login((function(response) {
+          if (response.authResponse) {
+            s(response);
+          } else {
+            f(response.status);
+          }
+        }), permissionObj);
+      },
+      getAccessToken: function(s, f) {
+        var response;
+        response = FB.getAccessToken();
+        if (!response) {
+          if (!f) {
+            console.error("NO_TOKEN");
+          } else {
+            f("NO_TOKEN");
+          }
+        } else {
+          s(response);
+        }
+      },
+      logEvent: function(eventName, params, valueToSum, s, f) {
+        s();
+      },
+      logPurchase: function(value, currency, s, f) {
+        s();
+      },
+      logout: function(s, f) {
+        var error;
+        try {
+          FB.logout(function(response) {
+            s(response);
+          });
+        } catch (_error) {
+          error = _error;
+          if (!f) {
+            console.error(error.message);
+          } else {
+            f(error.message);
+          }
+        }
+      },
+      api: function(graphPath, permissions, s, f) {
+        var error;
+        try {
+          FB.api(graphPath, function(response) {
+            if (response.error) {
+              f(response);
+            } else {
+              s(response);
+            }
+          });
+        } catch (_error) {
+          error = _error;
+          if (!f) {
+            console.error(error.message);
+          } else {
+            f(error.message);
+          }
+        }
+      },
+      browserInit: function(app, appId, version) {
+        if (version == null) {
+          version = 'v2.2';
+        }
+        return window.fbAsyncInit = function() {
+          FB.init({
+            appId: appId,
+            cookie: true,
+            xfbml: true,
+            version: version
+          });
+          return FB.getLoginStatus(function(response) {
+            if (response.status === "connected") {
+              return app.trigger('fb:status:connected');
+            }
+          });
+        };
+      }
+    };
+    (function() {
+      var e;
+      if (!window.FB && $("#fb-root").length > 0) {
+        console.log("launching FB SDK");
+        e = document.createElement("script");
+        e.src = document.location.protocol + "//connect.facebook.net/en_US/sdk.js";
+        e.async = true;
+        document.getElementById("fb-root").appendChild(e);
+      }
+    })();
+  }
   _.extend(Marionette.TemplateCache, {
     get: function(template) {
       var cachedTemplate, templateId;
@@ -62,11 +213,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     },
     compileTemplate: function(rawTemplate) {
       return Handlebars.compile(rawTemplate);
-    }
-  });
-  _.mixin({
-    isFbDefined: function() {
-      return typeof FB === 'object';
     }
   });
   Ajency.CurrentUser = (function(_super) {
@@ -126,16 +272,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     CurrentUser.prototype.getFacebookPicture = function() {
       var options;
-      if (!_.isFbDefined()) {
-        return;
-      }
       options = {
         "redirect": false,
         "height": "200",
         "type": "normal",
         "width": "200"
       };
-      return FB.api("/me/picture", options, this._setProfilePicture);
+      return facebookConnectPlugin.api("/me/picture", [], this._setProfilePicture);
     };
 
     CurrentUser.prototype._setProfilePicture = function(resp) {
@@ -220,7 +363,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         url: '/*notFound'
       }
     },
-    navigate: Backbone.Router.prototype.navigate,
     getCurrentRoute: function() {
       return Backbone.history.getFragment();
     },
@@ -357,6 +499,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     __extends(LoginView, _super);
 
     function LoginView() {
+      this._fbLoginSuccess = __bind(this._fbLoginSuccess, this);
       this._fbLoginHandler = __bind(this._fbLoginHandler, this);
       this.loginWithFacebook = __bind(this.loginWithFacebook, this);
       return LoginView.__super__.constructor.apply(this, arguments);
@@ -387,26 +530,35 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     LoginView.prototype.loginWithFacebook = function(evt) {
       var _scope;
-      if (!_.isFbDefined()) {
-        throw new Marionette.Error('Please add facebook SDK');
-      }
       _scope = this.ui.fbLoginButton.attr('fb-scope');
       _scope = !_.isString(_scope) ? '' : _scope;
-      return FB.login(this._fbLoginHandler, {
-        scope: _scope
-      });
+      return facebookConnectPlugin.getLoginStatus((function(_this) {
+        return function(resp) {
+          if (resp.status !== 'connected') {
+            return facebookConnectPlugin.login(_scope, _this._fbLoginHandler);
+          } else {
+            return _this._fbLoginSuccess();
+          }
+        };
+      })(this));
     };
 
     LoginView.prototype._fbLoginHandler = function(response) {
       if (response.authResponse) {
-        return FB.api('/me', (function(_this) {
-          return function(user) {
-            return _this.triggerMethod('facebook:login:success', user, response.authResponse.accessToken);
-          };
-        })(this));
+        return this._fbLoginSuccess();
       } else {
         return this.triggerMethod('facebook:login:cancel');
       }
+    };
+
+    LoginView.prototype._fbLoginSuccess = function() {
+      return facebookConnectPlugin.api('/me', [], (function(_this) {
+        return function(user) {
+          return facebookConnectPlugin.getAccessToken(function(token) {
+            return _this.trigger('facebook:login:success', user, token);
+          });
+        };
+      })(this));
     };
 
     LoginView.prototype.loginDefault = function() {
