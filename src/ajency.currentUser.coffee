@@ -45,19 +45,19 @@ class Ajency.CurrentUser extends Backbone.Model
 			"type": "normal"
 			"width": "200"
 
-		FB.api "/me/picture", options, @_setProfilePicture
+		facebookConnectPlugin.api "/me/picture",[], @_setProfilePicture
 
 	_setProfilePicture : (resp)=>
-				if resp and not resp.error
-					_picture =
-						'id' : 0
-						'sizes' :
-							"thumbnail" :
-								"height" : 150
-								"width" : 150
-								"url" : resp.data.url
+		if resp and not resp.error
+			_picture =
+				'id' : 0
+				'sizes' :
+					"thumbnail" :
+						"height" : 150
+						"width" : 150
+						"url" : resp.data.url
 
-					@set 'profile_picture',_picture
+			@set 'profile_picture',_picture
 
 	authenticate : (args...)->
 	    _currentUser = this
