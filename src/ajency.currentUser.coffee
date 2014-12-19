@@ -6,9 +6,6 @@
 #  - isLoggedIn()
 #  - hasCap()
 
-_.mixin
-	isFbDefined : ->
-		typeof FB is 'object'
 
 class Ajency.CurrentUser extends Backbone.Model
 
@@ -42,9 +39,6 @@ class Ajency.CurrentUser extends Backbone.Model
 		return false
 
 	getFacebookPicture : ->
-		if not _.isFbDefined()
-			return
-
 		options =
 			"redirect": false
 			"height": "200"

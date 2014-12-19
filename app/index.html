@@ -27,6 +27,7 @@
     <body>
         <!-- markup here -->
         <div ui-region classs="container-fluid"></div>
+        <div id="fb-root"></div>
         <script id="universities-single-template" type="x">
             <div class="row">
             		    <div class="col-xs-10">
@@ -214,6 +215,7 @@
         <script "text/javascript" src="ajency.marionette.js"></script>
         <script "text/javascript">
             App = new Marionette.Application
+            facebookConnectPlugin.browserInit(App, '1536911019885325');
         </script>
         <script type="text/javascript" src="js/scripts.js"></script>
     </body>
