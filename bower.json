@@ -1,6 +1,6 @@
 {
   "name": "ajency.marionette",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "homepage": "https://github.com/surajajency/ajency.marionette",
   "authors": [
     "Suraj Air <suraj@ajency.in>"
@@ -13,7 +13,7 @@
     "bower_components",
     "spec",
     "tmp",
-    "app"
+    "app",
     "test",
     "tests"
   ],
