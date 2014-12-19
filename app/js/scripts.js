@@ -99,20 +99,22 @@ App.RootCtrl = (function(_super) {
 
 })(Marionette.RegionController);
 
-App.LoginCtrl = (function(_super) {
-  __extends(LoginCtrl, _super);
+App.LoginCtrl = Ajency.LoginCtrl;
 
-  function LoginCtrl() {
-    return LoginCtrl.__super__.constructor.apply(this, arguments);
+App.LsoginCtrl = (function(_super) {
+  __extends(LsoginCtrl, _super);
+
+  function LsoginCtrl() {
+    return LsoginCtrl.__super__.constructor.apply(this, arguments);
   }
 
-  LoginCtrl.prototype.initialize = function() {
+  LsoginCtrl.prototype.initialize = function() {
     return this.show(new Marionette.ItemView({
       template: '#login-template'
     }));
   };
 
-  return LoginCtrl;
+  return LsoginCtrl;
 
 })(Marionette.RegionController);
 
@@ -368,7 +370,7 @@ jQuery(document).ready(function($) {
   App.addInitializer(function() {
     App.currentUser.set(userData);
     Backbone.history.start();
-    return App.navigate('/universities/23', true);
+    return App.navigate('/login', true);
   });
   return App.start();
 });

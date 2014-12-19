@@ -3,7 +3,7 @@
 # Ajency.Marionette
 # https://github.com/ajency/ajency.marionette/wiki
 # --------------------------------------------------
-# Version: v0.2.3
+# Version: v0.2.4
 #
 # Copyright(c) 2014 Team Ajency, Ajency.in
 # Distributed under MIT license
@@ -44,6 +44,7 @@
 	authNS = $.initNamespaceStorage 'auth'
 	currentUserNS = $.initNamespaceStorage 'currentUser'
 
+	# @include ../cordova.facebook.coffee
 	# @include ../ajency.templateCache.coffee
 	# @include ../ajency.currentUser.coffee
 	# @include ../ajency.application.coffee

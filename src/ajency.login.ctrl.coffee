@@ -16,20 +16,24 @@ class Ajency.LoginView extends Marionette.ItemView
 			@triggerMethod 'user:auth:failed', response
 
 	loginWithFacebook : (evt)=>
-		if not _.isFbDefined()
-			throw new Marionette.Error 'Please add facebook SDK'
-
 		_scope = @ui.fbLoginButton.attr 'fb-scope'
 		_scope = if not _.isString(_scope) then '' else _scope
-		FB.login @_fbLoginHandler, scope: _scope
+		facebookConnectPlugin.getLoginStatus (resp)=>
+			if resp.status isnt 'connected'
+				facebookConnectPlugin.login _scope, @_fbLoginHandler
+			else
+				@_fbLoginSuccess()
 
 	_fbLoginHandler : (response)=>
-
 		if response.authResponse
-			FB.api '/me', (user)=>
-				@triggerMethod 'facebook:login:success', user, response.authResponse.accessToken
+			@_fbLoginSuccess()
 		else
 			@triggerMethod 'facebook:login:cancel'
+
+	_fbLoginSuccess : =>
+		facebookConnectPlugin.api '/me',[], (user)=>
+			facebookConnectPlugin.getAccessToken (token)=>
+				@trigger 'facebook:login:success', user, token
 
 	loginDefault : ->
 		data =
