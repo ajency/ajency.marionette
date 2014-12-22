@@ -16,6 +16,7 @@ class Ajency.LoginView extends Marionette.ItemView
 			@triggerMethod 'user:auth:failed', response
 
 	loginWithFacebook : (evt)=>
+		$(evt.target).text 'Logging in... Please Wait...'
 		_scope = @ui.fbLoginButton.attr 'fb-scope'
 		_scope = if not _.isString(_scope) then '' else _scope
 		facebookConnectPlugin.getLoginStatus (resp)=>
@@ -43,7 +44,7 @@ class Ajency.LoginView extends Marionette.ItemView
 
 
 # Login controller
-class Ajency.LoginCtrl extends Marionette.RegionController
+class Ajency.LoginCtrl extends Ajency.RegionController
 	initialize : ->
 		loginView = new Ajency.LoginView
 		@listenTo loginView, 'facebook:login:success', @_facebookAuthSuccess

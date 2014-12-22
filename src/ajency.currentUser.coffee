@@ -10,18 +10,13 @@
 class Ajency.CurrentUser extends Backbone.Model
 
 	defaults : ->
-		return {}
-
-	initialize : (opt)->
-		if currentUserNS.localStorage.isSet 'userModel'
-			@set currentUserNS.localStorage.get 'userModel'
+		caps : {}
 
 	isLoggedIn : ->
-		authNS.localStorage.isSet 'HTTP_X_API_KEY'
+		authNS.localStorage.isSet('HTTP_X_API_KEY') and not @isNew()
 
 	logout : ->
 		authNS.localStorage.removeAll()
-		currentUserNS.localStorage.removeAll()
 		@trigger 'user:logged:out'
 
 	hasCap : (capName = '')->
