@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.3.1
+ * Version: v0.3.2
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -224,22 +224,17 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     }
 
     CurrentUser.prototype.defaults = function() {
-      return {};
-    };
-
-    CurrentUser.prototype.initialize = function(opt) {
-      if (currentUserNS.localStorage.isSet('userModel')) {
-        return this.set(currentUserNS.localStorage.get('userModel'));
-      }
+      return {
+        caps: {}
+      };
     };
 
     CurrentUser.prototype.isLoggedIn = function() {
-      return authNS.localStorage.isSet('HTTP_X_API_KEY');
+      return authNS.localStorage.isSet('HTTP_X_API_KEY') && !this.isNew();
     };
 
     CurrentUser.prototype.logout = function() {
       authNS.localStorage.removeAll();
-      currentUserNS.localStorage.removeAll();
       return this.trigger('user:logged:out');
     };
 
@@ -642,6 +637,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     LoginView.prototype.loginWithFacebook = function(evt) {
       var _scope;
+      $(evt.target).text('Logging in... Please Wait...');
       _scope = this.ui.fbLoginButton.attr('fb-scope');
       _scope = !_.isString(_scope) ? '' : _scope;
       return facebookConnectPlugin.getLoginStatus((function(_this) {
@@ -712,7 +708,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     return LoginCtrl;
 
-  })(Marionette.RegionController);
+  })(Ajency.RegionController);
   NothingFoundView = (function(_super) {
     __extends(NothingFoundView, _super);
 
