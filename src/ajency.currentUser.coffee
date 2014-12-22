@@ -9,6 +9,8 @@
 
 class Ajency.CurrentUser extends Backbone.Model
 
+	idAttribute : 'ID'
+
 	defaults : ->
 		caps : {}
 
@@ -34,13 +36,7 @@ class Ajency.CurrentUser extends Backbone.Model
 		return false
 
 	getFacebookPicture : ->
-		options =
-			"redirect": false
-			"height": "200"
-			"type": "normal"
-			"width": "200"
-
-		facebookConnectPlugin.api "/me/picture",[], @_setProfilePicture
+		facebookConnectPlugin.api "/me/picture?width=200",[], @_setProfilePicture
 
 	_setProfilePicture : (resp)=>
 		if resp and not resp.error
@@ -64,7 +60,6 @@ class Ajency.CurrentUser extends Backbone.Model
 	        else
 	            authNS.localStorage.set "HTTP_X_API_KEY", xhr.getResponseHeader("HTTP_X_API_KEY")
 	            authNS.localStorage.set "HTTP_X_SHARED_SECRET", xhr.getResponseHeader("HTTP_X_SHARED_SECRET")
-	            currentUserNS.localStorage.set "userModel", response
 	            _currentUser.set response
 	            _currentUser.trigger "user:auth:success", _currentUser
 

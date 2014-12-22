@@ -60,9 +60,6 @@ class Ajency.UploadView extends Marionette.ItemView
 					title : "Image files"
 					extensions : "jpg,gif,png"
 				]
-				multipart_params :
-					action : "upload-attachment"
-					_wpnonce : _WP_MEDIA_NONCE
 				init:
 					PostInit: (up)->
 						document.getElementById("filelist").innerHTML = ""

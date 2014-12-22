@@ -1,5 +1,8 @@
 _.extend Marionette.Application::,
 
+	initialize : (options = {})->
+		@currentUser = currentUser
+
 	appStates :
 		'NothingFound' : url : '/*notFound'
 
@@ -16,7 +19,6 @@ _.extend Marionette.Application::,
 		@router = new Marionette.AppStates app : @
 
 	start : (options = {})->
-		@currentUser = currentUser
 		@_detectRegions()
 		@triggerMethod 'before:start', options
 		@_registerStates()
