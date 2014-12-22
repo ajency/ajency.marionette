@@ -34,6 +34,11 @@ class Ajency.FormBehavior extends Marionette.Behavior
 		# set parsley namespace
 		@form.attr 'data-parsley-namespace', 'aj-field-'
 		@validator = @view.validator = $(@form).parsley()
+		$(@form).parsley().subscribe 'parsley:form:validate', (formInstance)=> @view.triggerMethod 'form:validate', formInstance
+		$(@form).parsley().subscribe 'parsley:form:validated', (formInstance)=> @view.triggerMethod 'form:validated', formInstance
+		$(@form).parsley().subscribe 'parsley:field:validate', (formInstance)=> @view.triggerMethod 'field:validate', formInstance
+		$(@form).parsley().subscribe 'parsley:field:success', (formInstance)=> @view.triggerMethod 'field:success', formInstance
+		$(@form).parsley().subscribe 'parsley:field:error', (formInstance)=> @view.triggerMethod 'field:error', formInstance
 
 	_cleanUpView : ->
 		delete @view.validator

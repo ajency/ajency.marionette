@@ -18,7 +18,7 @@ _.extend Marionette.Application::,
 	start : (options = {})->
 		@currentUser = currentUser
 		@_detectRegions()
-		@_registerStates()
 		@triggerMethod 'before:start', options
+		@_registerStates()
 		@_initCallbacks.run options, @
 		@triggerMethod 'start', options

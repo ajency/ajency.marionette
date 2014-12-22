@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.3.0
+ * Version: v0.3.1
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -388,8 +388,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }
       this.currentUser = currentUser;
       this._detectRegions();
-      this._registerStates();
       this.triggerMethod('before:start', options);
+      this._registerStates();
       this._initCallbacks.run(options, this);
       return this.triggerMethod('start', options);
     }
@@ -474,7 +474,32 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         this.form = this.view.$('form');
       }
       this.form.attr('data-parsley-namespace', 'aj-field-');
-      return this.validator = this.view.validator = $(this.form).parsley();
+      this.validator = this.view.validator = $(this.form).parsley();
+      $(this.form).parsley().subscribe('parsley:form:validate', (function(_this) {
+        return function(formInstance) {
+          return _this.view.triggerMethod('form:validate', formInstance);
+        };
+      })(this));
+      $(this.form).parsley().subscribe('parsley:form:validated', (function(_this) {
+        return function(formInstance) {
+          return _this.view.triggerMethod('form:validated', formInstance);
+        };
+      })(this));
+      $(this.form).parsley().subscribe('parsley:field:validate', (function(_this) {
+        return function(formInstance) {
+          return _this.view.triggerMethod('field:validate', formInstance);
+        };
+      })(this));
+      $(this.form).parsley().subscribe('parsley:field:success', (function(_this) {
+        return function(formInstance) {
+          return _this.view.triggerMethod('field:success', formInstance);
+        };
+      })(this));
+      return $(this.form).parsley().subscribe('parsley:field:error', (function(_this) {
+        return function(formInstance) {
+          return _this.view.triggerMethod('field:error', formInstance);
+        };
+      })(this));
     };
 
     FormBehavior.prototype._cleanUpView = function() {
