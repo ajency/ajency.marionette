@@ -30,12 +30,13 @@ class Ajency.CurrentUser extends Backbone.Model
 		caps : {}
 
 	isLoggedIn : ->
-		authNS.localStorage.isSet('HTTP_X_API_KEY') and not @isNew()
+		@isNew() is false
 
 	logout : ->
-		@clear()
+		@clear slient : true
 		authNS.localStorage.removeAll()
 		@trigger 'user:logged:out'
+		@setNotLoggedInCapabilities()
 
 	setNotLoggedInCapabilities  : ->
 		@set 'caps', window.notLoggedInCaps
@@ -104,6 +105,10 @@ currentUser = new Ajency.CurrentUser
 
 jQuery.ajaxSetup
 	beforeSend: (xhr, settings)->
+
+		if typeof WP_API_NONCE isnt 'undefined'
+			xhr.setRequestHeader 'X-WP-Nonce', WP_API_NONCE
+			return
 
 		if !authNS.localStorage.isSet 'HTTP_X_API_KEY'
 			return

@@ -1,18 +1,22 @@
 
 uploadTemplate = '<img src="{{sizes.thumbnail.url}}" width="100"
 					height="100" class="img-responsive img-rounded" />
-		    		<input type="hidden" name="media_id" value="{{id}}"/>
-		    		<input type="hidden" name="media_sizes" value="{{sizesToString}}"/>
-		    		<div id="filelist">Your browser doesnt have Flash, Silverlight or HTML5 support.</div>
-		        	<br />
-			        <div id="container">
-			            <a id="pickfiles" href="javascript:;">[Select file]</a>
-			            <a id="uploadfiles" href="javascript:;">[Upload file]</a>
-			        </div>
-		        <br />'
+					<input type="hidden" name="media_id" value="{{id}}"/>
+					<input type="hidden" name="media_sizes" value="{{sizesToString}}"/>
+					<div id="filelist">Your browser doesnt have Flash, Silverlight or HTML5 support.</div>
+					<br />
+					<div id="container">
+						<a id="pickfiles" href="javascript:;">[Select file]</a>
+						<a id="uploadfiles" href="javascript:;">[Upload file]</a>
+					</div>
+					<div class="file-error"></div>
+				<br />'
 
 class Ajency.UploadView extends Marionette.ItemView
 	template : Handlebars.compile uploadTemplate
+	ui : 
+		fileError : '.file-error'
+
 	initialize : (opt)->
 		{@model} = opt
 	mixinTemplateHelpers : (data)->
@@ -21,6 +25,10 @@ class Ajency.UploadView extends Marionette.ItemView
 		data
 
 	_pluploadHeaders : ->
+
+		if typeof WP_API_NONCE isnt 'undefined'
+			return 'X-WP-Nonce': WP_API_NONCE
+
 		if (!authNS.localStorage.isSet('HTTP_X_API_KEY'))
 			return
 
@@ -38,7 +46,7 @@ class Ajency.UploadView extends Marionette.ItemView
 		{
 			'HTTP_X_API_KEY': HTTP_X_API_KEY
 			'HTTP_X_API_TIMESTAMP': timeStamp
-			'HTTP_X_API_SIGNATURE': apiSignature
+			'HTTP_X_API_SIGNATURE': apiSignature.toString()
 		}
 
 	onShow : ->
@@ -66,15 +74,16 @@ class Ajency.UploadView extends Marionette.ItemView
 						document.getElementById("uploadfiles").onclick = ->
 							up.start()
 
-					FilesAdded: (up, files) ->
+					FilesAdded: (up, files) =>
+						@ui.fileError.html ''
 						plupload.each files, (file) ->
 							document.getElementById("filelist").innerHTML += "<div id=\"" + file.id + "\">" + file.name + " (" + plupload.formatSize(file.size) + ") <b></b></div>"
 
 					UploadProgress: (up, file) ->
 						document.getElementById(file.id).getElementsByTagName("b")[0].innerHTML = "<span>" + file.percent + "%</span>"
 
-					Error: (up, err) ->
-						document.getElementById("console").innerHTML += "\nError #" + err.code + ": " + err.message
+					Error: (up, err) =>
+						@ui.fileError.html "\nError #" + err.code + ": " + err.message
 
 					FileUploaded : (up, file, response)=>
 						response = JSON.parse response.response

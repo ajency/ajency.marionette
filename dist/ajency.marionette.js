@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.3.9
+ * Version: v0.4.0
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -246,13 +246,16 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     CurrentUser.prototype.isLoggedIn = function() {
-      return authNS.localStorage.isSet('HTTP_X_API_KEY') && !this.isNew();
+      return this.isNew() === false;
     };
 
     CurrentUser.prototype.logout = function() {
-      this.clear();
+      this.clear({
+        slient: true
+      });
       authNS.localStorage.removeAll();
-      return this.trigger('user:logged:out');
+      this.trigger('user:logged:out');
+      return this.setNotLoggedInCapabilities();
     };
 
     CurrentUser.prototype.setNotLoggedInCapabilities = function() {
@@ -347,6 +350,10 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   jQuery.ajaxSetup({
     beforeSend: function(xhr, settings) {
       var HTTP_X_API_KEY, HTTP_X_SHARED_SECRET, apiSignature, args, timeStamp;
+      if (typeof WP_API_NONCE !== 'undefined') {
+        xhr.setRequestHeader('X-WP-Nonce', WP_API_NONCE);
+        return;
+      }
       if (!authNS.localStorage.isSet('HTTP_X_API_KEY')) {
         return;
       }
@@ -794,7 +801,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     return NothingFoundCtrl;
 
   })(Marionette.RegionController);
-  uploadTemplate = '<img src="{{sizes.thumbnail.url}}" width="100" height="100" class="img-responsive img-rounded" /> <input type="hidden" name="media_id" value="{{id}}"/> <input type="hidden" name="media_sizes" value="{{sizesToString}}"/> <div id="filelist">Your browser doesnt have Flash, Silverlight or HTML5 support.</div> <br /> <div id="container"> <a id="pickfiles" href="javascript:;">[Select file]</a> <a id="uploadfiles" href="javascript:;">[Upload file]</a> </div> <br />';
+  uploadTemplate = '<img src="{{sizes.thumbnail.url}}" width="100" height="100" class="img-responsive img-rounded" /> <input type="hidden" name="media_id" value="{{id}}"/> <input type="hidden" name="media_sizes" value="{{sizesToString}}"/> <div id="filelist">Your browser doesnt have Flash, Silverlight or HTML5 support.</div> <br /> <div id="container"> <a id="pickfiles" href="javascript:;">[Select file]</a> <a id="uploadfiles" href="javascript:;">[Upload file]</a> </div> <div class="file-error"></div> <br />';
   Ajency.UploadView = (function(_super) {
     __extends(UploadView, _super);
 
@@ -803,6 +810,10 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     }
 
     UploadView.prototype.template = Handlebars.compile(uploadTemplate);
+
+    UploadView.prototype.ui = {
+      fileError: '.file-error'
+    };
 
     UploadView.prototype.initialize = function(opt) {
       return this.model = opt.model, opt;
@@ -816,6 +827,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     UploadView.prototype._pluploadHeaders = function() {
       var HTTP_X_API_KEY, HTTP_X_SHARED_SECRET, apiSignature, args, timeStamp;
+      if (typeof WP_API_NONCE !== 'undefined') {
+        return {
+          'X-WP-Nonce': WP_API_NONCE
+        };
+      }
       if (!authNS.localStorage.isSet('HTTP_X_API_KEY')) {
         return;
       }
@@ -833,7 +849,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       return {
         'HTTP_X_API_KEY': HTTP_X_API_KEY,
         'HTTP_X_API_TIMESTAMP': timeStamp,
-        'HTTP_X_API_SIGNATURE': apiSignature
+        'HTTP_X_API_SIGNATURE': apiSignature.toString()
       };
     };
 
@@ -864,17 +880,22 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
               return up.start();
             };
           },
-          FilesAdded: function(up, files) {
-            return plupload.each(files, function(file) {
-              return document.getElementById("filelist").innerHTML += "<div id=\"" + file.id + "\">" + file.name + " (" + plupload.formatSize(file.size) + ") <b></b></div>";
-            });
-          },
+          FilesAdded: (function(_this) {
+            return function(up, files) {
+              _this.ui.fileError.html('');
+              return plupload.each(files, function(file) {
+                return document.getElementById("filelist").innerHTML += "<div id=\"" + file.id + "\">" + file.name + " (" + plupload.formatSize(file.size) + ") <b></b></div>";
+              });
+            };
+          })(this),
           UploadProgress: function(up, file) {
             return document.getElementById(file.id).getElementsByTagName("b")[0].innerHTML = "<span>" + file.percent + "%</span>";
           },
-          Error: function(up, err) {
-            return document.getElementById("console").innerHTML += "\nError #" + err.code + ": " + err.message;
-          },
+          Error: (function(_this) {
+            return function(up, err) {
+              return _this.ui.fileError.html("\nError #" + err.code + ": " + err.message);
+            };
+          })(this),
           FileUploaded: (function(_this) {
             return function(up, file, response) {
               response = JSON.parse(response.response);
