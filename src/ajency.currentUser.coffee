@@ -70,31 +70,33 @@ class Ajency.CurrentUser extends Backbone.Model
 			@set 'profile_picture',_picture
 
 	authenticate : (args...)->
-	    _currentUser = this
-	    _this = this
-	    responseFn = (response, status, xhr) ->
-	        if _.isUndefined(response.ID)
-	            _currentUser.trigger "user:auth:failed", response
-	            _this.trigger "user:auth:failed", response
-	        else
-	            authNS.localStorage.set "HTTP_X_API_KEY", xhr.getResponseHeader("HTTP_X_API_KEY")
-	            authNS.localStorage.set "HTTP_X_SHARED_SECRET", xhr.getResponseHeader("HTTP_X_SHARED_SECRET")
-	            _currentUser.set response
-	            _currentUser.trigger "user:auth:success", _currentUser
+		_currentUser = this
+		_this = this
+		responseFn = (response, status, xhr) ->
+			if _.isUndefined(response.ID)
+				_currentUser.trigger "user:auth:failed", response
+				_this.trigger "user:auth:failed", response
+			else
+				authNS.localStorage.set "HTTP_X_API_KEY", xhr.getResponseHeader("HTTP_X_API_KEY")
+				authNS.localStorage.set "HTTP_X_SHARED_SECRET", xhr.getResponseHeader("HTTP_X_SHARED_SECRET")
+				_currentUser.set response
+				_currentUser.trigger "user:auth:success", _currentUser
 
-	    if _.isString(args[0])
-	        userData = args[1]
-	        accessToken = args[2]
-	        userLogin = "FB_" + userData.id
-	        data =
-	            user_login: userLogin
-	            user_pass: accessToken
-	            type: "facebook"
-	            userData: userData
+		if _.isString(args[0])
+			userData = args[1]
+			accessToken = args[2]
+			userLogin = "FB_" + userData.id
+			data =
+				user_login: userLogin
+				user_pass: accessToken
+				type: "facebook"
+				userData: userData
 
-	        $.post "" + APIURL + "/authenticate", data, responseFn, "json"
-	    else if _.isObject(args[0])
-	        $.post "" + APIURL + "/authenticate", args[0], responseFn, "json"
+			xhr = $.post "" + APIURL + "/authenticate", data, responseFn, "json"
+		else if _.isObject(args[0])
+			xhr = $.post "" + APIURL + "/authenticate", args[0], responseFn, "json"
+
+		xhr
 
 
 # define the logged in user singleton
