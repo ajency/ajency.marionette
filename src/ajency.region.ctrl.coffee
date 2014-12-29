@@ -22,11 +22,11 @@ class Ajency.RegionController extends Marionette.RegionController
 		@_ctrlID = _.uniqueId 'ctrl-'
 		@_region = options.region
 
-		capName = "access_#{options.stateName}"
 		# convert the cap name to lower case
-		capName = capName.toLowerCase()
-		if currentUser.hasCap capName
-			super options
+		capName = "access_#{options.stateName}".toLowerCase()
+		
+		if Ajency.allSystemCapExists(capName) and currentUser.hasCap(capName)
+			super options 
 		else
 			@_showNoAccessView capName
 
@@ -36,11 +36,15 @@ class Ajency.RegionController extends Marionette.RegionController
 		@show new Ajency.NoAccessView type : _type
 
 	_getNoAccessType : (capName)->
-		if not currentUser.capExists capName
+
+		if not Ajency.allSystemCapExists(capName)
 			_type = 'not_defined'
-		else if currentUser.capExists(capName) and not currentUser.isLoggedIn()
-			_type = 'no_access_login'
-		else
+
+		else if currentUser.isLoggedIn() and not currentUser.hasCap(capName)
 			_type = 'no_access'
+
+		else if not currentUser.isLoggedIn() and Ajency.allSystemCapExists(capName)
+			_type = 'no_access_login'
+	
 		_type
 

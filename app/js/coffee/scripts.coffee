@@ -111,7 +111,7 @@ class UniversitiesSingleView extends Marionette.ItemView
 	onFormInit : (args...)->
 		console.log args...
 
-class App.UniversitiesSingleCtrl extends Marionette.RegionController
+class App.UniversitiesSingleCtrl extends Ajency.RegionController
 	initialize : ->
 		@show new UniversitiesSingleView
 

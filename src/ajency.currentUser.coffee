@@ -6,6 +6,21 @@
 #  - isLoggedIn()
 #  - hasCap()
 
+window.notLoggedInCaps = window.notLoggedInCaps or {}
+window.allSystemCaps = window.allSystemCaps or []
+
+Ajency.notLoggedInCapExists = (capName)->
+	if not _.isObject window.notLoggedInCaps
+		return false
+
+	if not window.notLoggedInCaps[capName]
+		return false
+
+	return true
+
+
+Ajency.allSystemCapExists = (capName)->
+	_.indexOf(window.allSystemCaps, capName) isnt -1
 
 class Ajency.CurrentUser extends Backbone.Model
 
@@ -18,8 +33,12 @@ class Ajency.CurrentUser extends Backbone.Model
 		authNS.localStorage.isSet('HTTP_X_API_KEY') and not @isNew()
 
 	logout : ->
+		@clear()
 		authNS.localStorage.removeAll()
 		@trigger 'user:logged:out'
+
+	setNotLoggedInCapabilities  : ->
+		@set 'caps', window.notLoggedInCaps
 
 	hasCap : (capName = '')->
 		if not @has('caps') then return false
@@ -31,7 +50,7 @@ class Ajency.CurrentUser extends Backbone.Model
 	capExists : (capName)->
 		if not @has('caps') then return false
 		caps = @get 'caps'
-		if not _.isUndefined(caps[capName])
+		if not _.isUndefined caps[capName]
 			return true
 		return false
 

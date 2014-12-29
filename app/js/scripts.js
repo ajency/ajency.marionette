@@ -290,7 +290,7 @@ App.UniversitiesSingleCtrl = (function(_super) {
 
   return UniversitiesSingleCtrl;
 
-})(Marionette.RegionController);
+})(Ajency.RegionController);
 
 jQuery(document).ready(function($) {
   App.state('login').state('root', {
