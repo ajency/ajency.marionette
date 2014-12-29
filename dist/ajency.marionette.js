@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.3.7
+ * Version: v0.3.9
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -36,7 +36,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   }
 })(this, function(root, $, Backbone, _, Marionette, Handlebars) {
   "use strict";
-  var Ajency, NothingFoundView, authNS, currentUser, currentUserNS, currentUserTemplate, uploadTemplate;
+  var Ajency, NothingFoundView, authNS, currentUser, currentUserNS, currentUserTemplate, loginViewTemplate, uploadTemplate;
   Ajency = {};
   authNS = $.initNamespaceStorage('auth');
   currentUserNS = $.initNamespaceStorage('currentUser');
@@ -308,7 +308,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     CurrentUser.prototype.authenticate = function() {
-      var accessToken, args, data, responseFn, userData, userLogin, _currentUser, _this;
+      var accessToken, args, data, responseFn, userData, userLogin, xhr, _currentUser, _this;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       _currentUser = this;
       _this = this;
@@ -333,10 +333,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           type: "facebook",
           userData: userData
         };
-        return $.post("" + APIURL + "/authenticate", data, responseFn, "json");
+        xhr = $.post("" + APIURL + "/authenticate", data, responseFn, "json");
       } else if (_.isObject(args[0])) {
-        return $.post("" + APIURL + "/authenticate", args[0], responseFn, "json");
+        xhr = $.post("" + APIURL + "/authenticate", args[0], responseFn, "json");
       }
+      return xhr;
     };
 
     return CurrentUser;
@@ -619,20 +620,25 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     return RegionController;
 
   })(Marionette.RegionController);
+  loginViewTemplate = '<div class="container-fluid"> <div class="row"> <div class="col-md-12"> <h3 class="special brand text-center m-b-50 m-t-5">Sign In</h3> <div class="response-message"></div> <div class="form-group fly-group m-t-20"> <label class="fly-label classic">Username</label> <input type="text" required name="user_login" id="user_login" class="srch-filters form-control" placeholder="Username" aria-label="Username"> <span class="fa fa-user form-control-feedback" aria-hidden="true"></span> </div> <div class="form-group fly-group m-t-30"> <label class="fly-label classic">Password</label> <input type="password" required name="user_pass" id="user_pass" class="srch-filters form-control" placeholder="Password" aria-label="Password"> <span class="fa fa-lock form-control-feedback" aria-hidden="true"></span> </div> <button type="button" class="btn btn-primary btn-block raised aj-submit-button aj-login-button m-t-40 m-b-20">SIGN IN</button> </div> </div> </div>';
   Ajency.LoginView = (function(_super) {
     __extends(LoginView, _super);
 
     function LoginView() {
       this._fbLoginSuccess = __bind(this._fbLoginSuccess, this);
-      this._fbLoginHandler = __bind(this._fbLoginHandler, this);
+      this._fbFailureLoginHandler = __bind(this._fbFailureLoginHandler, this);
+      this._fbSuccessLoginHandler = __bind(this._fbSuccessLoginHandler, this);
       this.loginWithFacebook = __bind(this.loginWithFacebook, this);
       return LoginView.__super__.constructor.apply(this, arguments);
     }
 
-    LoginView.prototype.template = '#login-template';
+    LoginView.prototype.tagName = 'form';
+
+    LoginView.prototype.template = Handlebars.compile(loginViewTemplate);
 
     LoginView.prototype.ui = {
-      'loginBtn': '.aj-login-button',
+      'responseMessage': '.response-message',
+      'loginBtn': '.aj-submit-button',
       'fbLoginButton': '.aj-fb-login-button',
       'userLogin': 'input[name="user_login"]',
       'userPass': 'input[name="user_pass"]'
@@ -641,6 +647,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     LoginView.prototype.events = {
       'click @ui.loginBtn': 'loginDefault',
       'click @ui.fbLoginButton': 'loginWithFacebook'
+    };
+
+    LoginView.prototype.behaviors = {
+      FormBehavior: {
+        behaviorClass: Ajency.FormBehavior
+      }
     };
 
     LoginView.prototype.initialize = function(options) {
@@ -655,12 +667,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     LoginView.prototype.loginWithFacebook = function(evt) {
       var _scope;
       $(evt.target).text('Logging in... Please Wait...');
-      _scope = this.ui.fbLoginButton.attr('fb-scope');
-      _scope = !_.isString(_scope) ? '' : _scope;
+      _scope = this._getScope();
       return facebookConnectPlugin.getLoginStatus((function(_this) {
         return function(resp) {
           if (resp.status !== 'connected') {
-            return facebookConnectPlugin.login(_scope, _this._fbLoginHandler);
+            return facebookConnectPlugin.login(_scope, _this._fbSuccessLoginHandler, _this._fbFailureLoginHandler);
           } else {
             return _this._fbLoginSuccess();
           }
@@ -668,12 +679,24 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       })(this));
     };
 
-    LoginView.prototype._fbLoginHandler = function(response) {
+    LoginView.prototype._getScope = function() {
+      var _scope;
+      _scope = this.ui.fbLoginButton.attr('fb-scope');
+      _scope = !_.isString(_scope) ? '' : _scope;
+      _scope = _scope.split(',');
+      return _scope;
+    };
+
+    LoginView.prototype._fbSuccessLoginHandler = function(response) {
       if (response.authResponse) {
         return this._fbLoginSuccess();
-      } else {
-        return this.triggerMethod('facebook:login:cancel');
       }
+    };
+
+    LoginView.prototype._fbFailureLoginHandler = function() {
+      this.triggerMethod('facebook:login:cancel');
+      this.ui.fbLoginButton.text('Login with Facebook');
+      return this.ui.fbLoginButton.after('<p class="text-center authentication-cancelled">Authentication cancelled by user</p>');
     };
 
     LoginView.prototype._fbLoginSuccess = function() {
@@ -686,13 +709,32 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       })(this));
     };
 
-    LoginView.prototype.loginDefault = function() {
-      var data;
+    LoginView.prototype.onFormSubmit = function(data) {
+      this.$('.alert').empty().removeClass('alert alert-danger');
+      this.ui.loginBtn.text('Signing in... Please Wait...');
       data = {
         user_login: this.ui.userLogin.val(),
         user_pass: this.ui.userPass.val()
       };
-      return currentUser.authenticate(data);
+      return currentUser.authenticate(data).done((function(_this) {
+        return function(response) {
+          var failMessage;
+          if (_.isUndefined(response.ID)) {
+            _this.triggerMethod('basic:login:failure', response);
+            failMessage = response[0].message;
+            _this.ui.responseMessage.addClass('alert alert-danger').html(failMessage);
+            return _this.ui.loginBtn.text('Sign in');
+          }
+        };
+      })(this)).fail((function(_this) {
+        return function() {
+          var args, failMessage;
+          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+          failMessage = 'Request failed. Please try again';
+          _this.ui.responseMessage.addClass('alert alert-danger').html(failMessage);
+          return _this.ui.loginBtn.text('Sign in');
+        };
+      })(this));
     };
 
     return LoginView;
@@ -725,7 +767,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     return LoginCtrl;
 
-  })(Ajency.RegionController);
+  })(Marionette.RegionController);
   NothingFoundView = (function(_super) {
     __extends(NothingFoundView, _super);
 
