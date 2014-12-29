@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.3.5
+ * Version: v0.3.7
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -215,6 +215,20 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       return Handlebars.compile(rawTemplate);
     }
   });
+  window.notLoggedInCaps = window.notLoggedInCaps || {};
+  window.allSystemCaps = window.allSystemCaps || [];
+  Ajency.notLoggedInCapExists = function(capName) {
+    if (!_.isObject(window.notLoggedInCaps)) {
+      return false;
+    }
+    if (!window.notLoggedInCaps[capName]) {
+      return false;
+    }
+    return true;
+  };
+  Ajency.allSystemCapExists = function(capName) {
+    return _.indexOf(window.allSystemCaps, capName) !== -1;
+  };
   Ajency.CurrentUser = (function(_super) {
     __extends(CurrentUser, _super);
 
@@ -236,8 +250,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     CurrentUser.prototype.logout = function() {
+      this.clear();
       authNS.localStorage.removeAll();
       return this.trigger('user:logged:out');
+    };
+
+    CurrentUser.prototype.setNotLoggedInCapabilities = function() {
+      return this.set('caps', window.notLoggedInCaps);
     };
 
     CurrentUser.prototype.hasCap = function(capName) {
@@ -569,9 +588,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }
       this._ctrlID = _.uniqueId('ctrl-');
       this._region = options.region;
-      capName = "access_" + options.stateName;
-      capName = capName.toLowerCase();
-      if (currentUser.hasCap(capName)) {
+      capName = ("access_" + options.stateName).toLowerCase();
+      if (Ajency.allSystemCapExists(capName) && currentUser.hasCap(capName)) {
         RegionController.__super__.constructor.call(this, options);
       } else {
         this._showNoAccessView(capName);
@@ -588,12 +606,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     RegionController.prototype._getNoAccessType = function(capName) {
       var _type;
-      if (!currentUser.capExists(capName)) {
+      if (!Ajency.allSystemCapExists(capName)) {
         _type = 'not_defined';
-      } else if (currentUser.capExists(capName) && !currentUser.isLoggedIn()) {
-        _type = 'no_access_login';
-      } else {
+      } else if (currentUser.isLoggedIn() && !currentUser.hasCap(capName)) {
         _type = 'no_access';
+      } else if (!currentUser.isLoggedIn() && Ajency.allSystemCapExists(capName)) {
+        _type = 'no_access_login';
       }
       return _type;
     };
