@@ -4,7 +4,7 @@
  * Ajency.Marionette
  * https://github.com/ajency/ajency.marionette/wiki
  * --------------------------------------------------
- * Version: v0.4.0
+ * Version: v0.4.1
  *
  * Copyright(c) 2014 Team Ajency, Ajency.in
  * Distributed under MIT license
@@ -254,8 +254,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         slient: true
       });
       authNS.localStorage.removeAll();
-      this.trigger('user:logged:out');
-      return this.setNotLoggedInCapabilities();
+      this.setNotLoggedInCapabilities();
+      return this.trigger('user:logged:out');
     };
 
     CurrentUser.prototype.setNotLoggedInCapabilities = function() {
@@ -674,6 +674,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     LoginView.prototype.loginWithFacebook = function(evt) {
       var _scope;
       $(evt.target).text('Logging in... Please Wait...');
+      this.$('.authentication-cancelled').empty();
       _scope = this._getScope();
       return facebookConnectPlugin.getLoginStatus((function(_this) {
         return function(resp) {
@@ -717,7 +718,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
     };
 
     LoginView.prototype.onFormSubmit = function(data) {
-      this.$('.alert').empty().removeClass('alert alert-danger');
+      this.ui.responseMessage.empty().removeClass('alert alert-danger');
       this.ui.loginBtn.text('Signing in... Please Wait...');
       data = {
         user_login: this.ui.userLogin.val(),
@@ -774,7 +775,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
     return LoginCtrl;
 
-  })(Marionette.RegionController);
+  })(Ajency.RegionController);
   NothingFoundView = (function(_super) {
     __extends(NothingFoundView, _super);
 

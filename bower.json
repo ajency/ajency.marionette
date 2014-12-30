@@ -1,6 +1,6 @@
 {
   "name": "ajency.marionette",
-  "version": "0.3.9",
+  "version": "0.4.1",
   "homepage": "https://github.com/surajajency/ajency.marionette",
   "authors": [
     "Suraj Air <suraj@ajency.in>"
@@ -23,7 +23,7 @@
     "backbone": "~1.1.2",
     "backbone.marionette": "~2.3.0",
     "handlebars": "~2.0.0",
-    "marionette.state": "https://github.com/ajency/marionette.state.git#~0.2.0",
+    "marionette.state": "https://github.com/ajency/marionette.state.git#~0.2.1",
     "jQuery-Storage-API": "~1.7.3",
     "jquery.inputmask": "~3.1.48",
     "parsleyjs": "~2.0.6",
