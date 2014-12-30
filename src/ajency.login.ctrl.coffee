@@ -43,6 +43,7 @@ class Ajency.LoginView extends Marionette.ItemView
 
 	loginWithFacebook : (evt)=>
 		$(evt.target).text 'Logging in... Please Wait...'
+		@$('.authentication-cancelled').empty()
 		_scope = @_getScope()
 		facebookConnectPlugin.getLoginStatus (resp)=>
 			if resp.status isnt 'connected'
@@ -71,7 +72,7 @@ class Ajency.LoginView extends Marionette.ItemView
 				@trigger 'facebook:login:success', user, token
 
 	onFormSubmit : (data)->
-		@$('.alert').empty().removeClass 'alert alert-danger'
+		@ui.responseMessage.empty().removeClass 'alert alert-danger'
 		@ui.loginBtn.text 'Signing in... Please Wait...'
 		data =
 			user_login : @ui.userLogin.val()
@@ -89,7 +90,7 @@ class Ajency.LoginView extends Marionette.ItemView
 
 
 # Login controller
-class Ajency.LoginCtrl extends Marionette.RegionController
+class Ajency.LoginCtrl extends Ajency.RegionController
 	initialize : ->
 		loginView = new Ajency.LoginView
 		@listenTo loginView, 'facebook:login:success', @_facebookAuthSuccess

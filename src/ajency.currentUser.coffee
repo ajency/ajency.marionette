@@ -35,8 +35,8 @@ class Ajency.CurrentUser extends Backbone.Model
 	logout : ->
 		@clear slient : true
 		authNS.localStorage.removeAll()
-		@trigger 'user:logged:out'
 		@setNotLoggedInCapabilities()
+		@trigger 'user:logged:out'
 
 	setNotLoggedInCapabilities  : ->
 		@set 'caps', window.notLoggedInCaps
